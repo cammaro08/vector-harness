@@ -1,0 +1,45 @@
+name: "Refactor"
+description: "Refactoring workflow ensuring tests stay green"
+maxRetries: 3
+
+steps:
+  - name: "setup"
+    type: "deterministic"
+    action: "create_worktree"
+    description: "Create isolated git worktree for refactoring"
+    retryable: false
+
+  - name: "baseline-tests"
+    type: "deterministic"
+    tool: "testRunner"
+    description: "Capture baseline test results before refactoring"
+    retryable: false
+    failureAction: "block"
+
+  - name: "refactor"
+    type: "agent"
+    agent: "refactorer"
+    description: "Agent refactors the code"
+    retryable: true
+    maxRetries: 3
+
+  - name: "run-tests"
+    type: "deterministic"
+    tool: "testRunner"
+    description: "Verify tests still pass after refactor"
+    retryable: false
+    failureAction: "continue"
+
+  - name: "fix-regressions"
+    type: "agent"
+    agent: "test-fixer"
+    description: "Agent fixes any regressions from refactoring"
+    retryable: true
+    maxRetries: 3
+    condition: "steps.run-tests.failed > 0"
+
+  - name: "create-pr"
+    type: "deterministic"
+    action: "create_pull_request"
+    description: "Create pull request with refactored code"
+    retryable: false
