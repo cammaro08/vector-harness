@@ -2,6 +2,8 @@ import { validateCommitMessage } from "./validators/commit-validator";
 import { validateTests } from "./validators/test-validator";
 import { validateDocs } from "./validators/doc-validator";
 import { getStagedFiles, extractCommitMessage } from "./utils/git";
+import { logProgress } from "../../../tools/progressLog";
+import { getRetryContext, formatContextBanner, recordAttempt } from "./context-injector";
 
 interface ToolCallEvent {
   toolName: string;
@@ -46,11 +48,40 @@ export default function (pi: ExtensionAPI) {
     const cmd = event.input.command;
     if (!cmd || !isGitCommit(cmd)) return undefined;
 
+    const taskId = "git-commit-enforce";
+
+    // Log validation start
+    try {
+      await logProgress({
+        cwd: ctx.cwd,
+        eventType: "START_TASK",
+        stepName: "commit-validation",
+        attemptNumber: 1,
+        agentName: "pi-enforcer",
+        message: "Starting commit validation checks",
+      });
+    } catch (err) {
+      // Logging failure should not block validation
+    }
+
     // 1. Validate commit message
     const msg = extractCommitMessage(cmd);
     if (msg) {
       const commitResult = validateCommitMessage(msg);
       if (!commitResult.valid) {
+        try {
+          await logProgress({
+            cwd: ctx.cwd,
+            eventType: "FAIL",
+            stepName: "commit-message-validation",
+            attemptNumber: 1,
+            agentName: "pi-enforcer",
+            message: `Commit message validation failed: ${commitResult.issues.join("; ")}`,
+            metadata: { issues: commitResult.issues },
+          });
+        } catch (err) {
+          // Logging failure should not block validation
+        }
         return {
           blocked: true,
           message: `🚫 Commit blocked — poor commit message.\n\n${commitResult.message}\n\nWrite a detailed commit message with:\n- Subject line (under 72 chars)\n- Blank line\n- Body explaining what changed, why, and how (at least 2 lines)`,
@@ -62,6 +93,19 @@ export default function (pi: ExtensionAPI) {
     const staged = getStagedFiles(ctx.cwd);
     const testResult = validateTests(staged, ctx.cwd);
     if (!testResult.valid) {
+      try {
+        await logProgress({
+          cwd: ctx.cwd,
+          eventType: "FAIL",
+          stepName: "test-validation",
+          attemptNumber: 1,
+          agentName: "pi-enforcer",
+          message: `Test validation failed: missing tests for ${testResult.missing.length} file(s)`,
+          metadata: { missingTests: testResult.missing },
+        });
+      } catch (err) {
+        // Logging failure should not block validation
+      }
       return {
         blocked: true,
         message: `🚫 Commit blocked — missing tests.\n\n${testResult.message}\n\nCreate the missing test files before committing.`,
@@ -71,10 +115,36 @@ export default function (pi: ExtensionAPI) {
     // 3. Validate docs updated
     const docResult = validateDocs(staged, ctx.cwd);
     if (!docResult.valid) {
+      try {
+        await logProgress({
+          cwd: ctx.cwd,
+          eventType: "FAIL",
+          stepName: "docs-validation",
+          attemptNumber: 1,
+          agentName: "pi-enforcer",
+          message: `Docs validation failed: source code changed without doc updates`,
+        });
+      } catch (err) {
+        // Logging failure should not block validation
+      }
       return {
         blocked: true,
         message: `⚠️ Commit blocked — docs not updated.\n\n${docResult.message}`,
       };
+    }
+
+    // All validations passed
+    try {
+      await logProgress({
+        cwd: ctx.cwd,
+        eventType: "SUCCEED",
+        stepName: "commit-validation",
+        attemptNumber: 1,
+        agentName: "pi-enforcer",
+        message: "All commit validation checks passed",
+      });
+    } catch (err) {
+      // Logging failure should not block validation
     }
 
     return undefined;
@@ -92,10 +162,16 @@ export default function (pi: ExtensionAPI) {
   });
 
   // Hook: Inject enforcement rules into system context
-  pi.on("context", async (event: ContextEvent, _ctx: HookContext) => {
+  pi.on("context", async (event: ContextEvent, ctx: HookContext) => {
+    const taskId = "pi-enforce-context";
+    const retryContext = getRetryContext(taskId, 3);
+    const contextBanner = formatContextBanner(retryContext);
+
     event.messages.unshift({
       role: "user",
-      content: `[ENFORCEMENT RULES — PI Coding Agent]
+      content: `${contextBanner}
+
+[ENFORCEMENT RULES — PI Coding Agent]
 These rules are enforced automatically. Violations will block your commits.
 
 1. **Every .ts source file MUST have a corresponding .test.ts file.**

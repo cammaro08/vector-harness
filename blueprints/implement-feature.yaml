@@ -1,0 +1,52 @@
+name: "Implement Feature"
+description: "Full feature implementation workflow with per-step retry"
+maxRetries: 3
+
+steps:
+  - name: "setup"
+    type: "deterministic"
+    action: "create_worktree"
+    description: "Create isolated git worktree for the feature"
+    retryable: false
+
+  - name: "implement"
+    type: "agent"
+    agent: "implementer"
+    description: "Agent implements the feature based on requirements"
+    retryable: true
+    maxRetries: 3
+
+  - name: "run-tests"
+    type: "deterministic"
+    tool: "testRunner"
+    description: "Run tests and get actual results"
+    retryable: false
+    failureAction: "continue"
+
+  - name: "fix-failures"
+    type: "agent"
+    agent: "test-fixer"
+    description: "Agent fixes failing tests"
+    retryable: true
+    maxRetries: 3
+    condition: "steps.run-tests.failed > 0"
+
+  - name: "validate-coverage"
+    type: "deterministic"
+    tool: "coverageValidator"
+    description: "Validate coverage meets threshold"
+    retryable: false
+    failureAction: "block"
+
+  - name: "validate-docs"
+    type: "deterministic"
+    tool: "docValidator"
+    description: "Validate documentation is updated"
+    retryable: false
+    failureAction: "block"
+
+  - name: "create-pr"
+    type: "deterministic"
+    action: "create_pull_request"
+    description: "Create pull request with changes"
+    retryable: false

@@ -1,5 +1,17 @@
 import { existsSync } from "node:fs";
-import { join, dirname, basename, extname } from "node:path";
+import { join, dirname, basename, extname, resolve, relative } from "node:path";
+
+/**
+ * Checks if a resolved file path stays within the project root (cwd).
+ * Prevents path traversal attacks via crafted file paths.
+ */
+function isPathInBounds(cwd: string, filePath: string): boolean {
+  const resolvedCwd = resolve(cwd);
+  const resolvedFile = resolve(cwd, filePath);
+  const relPath = relative(resolvedCwd, resolvedFile);
+  // If the relative path starts with '..', it escapes the project root
+  return !relPath.startsWith('..');
+}
 
 const EXCLUDED_PATTERNS = [
   /\.test\.ts$/,
@@ -46,14 +58,20 @@ export function validateTests(
   changedFiles: string[],
   cwd: string
 ): { valid: boolean; missing: string[]; message: string } {
-  const sourceFiles = changedFiles.filter(isSourceFile);
+  // Filter out any files that try to escape the project root
+  const safeChangedFiles = changedFiles.filter(f => isPathInBounds(cwd, f));
+  const sourceFiles = safeChangedFiles.filter(isSourceFile);
   const missing: string[] = [];
 
   for (const file of sourceFiles) {
     const candidates = getTestCandidates(file);
-    const hasTest = candidates.some((candidate) =>
-      existsSync(join(cwd, candidate))
-    );
+    const hasTest = candidates.some((candidate) => {
+      // Skip candidates that try to escape the project root
+      if (!isPathInBounds(cwd, candidate)) {
+        return false;
+      }
+      return existsSync(join(cwd, candidate));
+    });
 
     if (!hasTest) {
       // Also check if the test file is among the changed files themselves

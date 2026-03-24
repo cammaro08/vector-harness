@@ -1,9 +1,19 @@
 import { execSync } from "node:child_process";
+import * as path from "path";
+
+function validateCwd(cwd: string): string {
+  const resolved = path.resolve(cwd);
+  if (!path.isAbsolute(resolved)) {
+    throw new Error(`Invalid working directory: must be absolute path, got: ${cwd}`);
+  }
+  return resolved;
+}
 
 export function getStagedFiles(cwd: string): string[] {
   try {
+    const validatedCwd = validateCwd(cwd);
     const output = execSync("git diff --cached --name-only", {
-      cwd,
+      cwd: validatedCwd,
       encoding: "utf-8",
     });
     return output.trim().split("\n").filter(Boolean);
@@ -14,8 +24,9 @@ export function getStagedFiles(cwd: string): string[] {
 
 export function getChangedFiles(cwd: string): string[] {
   try {
+    const validatedCwd = validateCwd(cwd);
     const output = execSync("git diff --name-only", {
-      cwd,
+      cwd: validatedCwd,
       encoding: "utf-8",
     });
     return output.trim().split("\n").filter(Boolean);
@@ -31,6 +42,11 @@ export function getAllChangedFiles(cwd: string): string[] {
 }
 
 export function extractCommitMessage(command: string): string | null {
+  // Validate command length to prevent ReDoS attacks
+  if (command.length > 10000) {
+    throw new Error(`Command too long for safe parsing (${command.length} chars, max 10000)`);
+  }
+
   // Match -m "...", -m '...', or -m ...
   // Handle escaped quotes inside the message
   const doubleQuoteMatch = command.match(

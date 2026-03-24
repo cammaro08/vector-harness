@@ -1,0 +1,38 @@
+name: "Fix Bug"
+description: "Bug fix workflow with per-step retry"
+maxRetries: 3
+
+steps:
+  - name: "setup"
+    type: "deterministic"
+    action: "create_worktree"
+    description: "Create isolated git worktree for the fix"
+    retryable: false
+
+  - name: "fix"
+    type: "agent"
+    agent: "bug-fixer"
+    description: "Agent debugs and implements the fix"
+    retryable: true
+    maxRetries: 3
+
+  - name: "run-tests"
+    type: "deterministic"
+    tool: "testRunner"
+    description: "Run tests to verify fix"
+    retryable: false
+    failureAction: "continue"
+
+  - name: "fix-regressions"
+    type: "agent"
+    agent: "test-fixer"
+    description: "Agent fixes any regressions introduced"
+    retryable: true
+    maxRetries: 3
+    condition: "steps.run-tests.failed > 0"
+
+  - name: "create-pr"
+    type: "deterministic"
+    action: "create_pull_request"
+    description: "Create pull request with the fix"
+    retryable: false
