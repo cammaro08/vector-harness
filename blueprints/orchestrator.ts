@@ -133,7 +133,7 @@ function evaluateCondition(
 ): boolean {
   const parsed = parseCondition(condition);
   if (!parsed) {
-    return false;
+    throw new Error(`Invalid condition expression: "${condition}". Valid format: "steps.<name>.<field> <operator> <value>" where operator is >, <, >=, <=, ==, ===`);
   }
 
   const stepResult = stepResults.get(parsed.stepName);
@@ -361,5 +361,41 @@ export function loadBlueprint(blueprintPath: string): Blueprint {
   const content = readFileSync(blueprintPath, 'utf-8');
   const data = load(content) as Record<string, unknown>;
 
-  return data as Blueprint;
+  // Validate required fields
+  if (!data || typeof data !== 'object') {
+    throw new Error(`Blueprint at ${blueprintPath} is not a valid YAML object`);
+  }
+  if (typeof data['name'] !== 'string' || !data['name']) {
+    throw new Error(`Blueprint missing required field 'name'`);
+  }
+  if (typeof data['description'] !== 'string') {
+    throw new Error(`Blueprint missing required field 'description'`);
+  }
+  if (typeof data['maxRetries'] !== 'number' || data['maxRetries'] < 1) {
+    throw new Error(`Blueprint 'maxRetries' must be a positive number`);
+  }
+  if (!Array.isArray(data['steps']) || data['steps'].length === 0) {
+    throw new Error(`Blueprint 'steps' must be a non-empty array`);
+  }
+
+  // Validate each step
+  const validTypes = ['deterministic', 'agent'];
+  const validFailureActions = ['continue', 'block', undefined];
+  for (const [i, step] of (data['steps'] as unknown[]).entries()) {
+    if (!step || typeof step !== 'object') {
+      throw new Error(`Blueprint step ${i} is not a valid object`);
+    }
+    const s = step as Record<string, unknown>;
+    if (typeof s['name'] !== 'string' || !s['name']) {
+      throw new Error(`Blueprint step ${i} missing required field 'name'`);
+    }
+    if (!validTypes.includes(s['type'] as string)) {
+      throw new Error(`Blueprint step '${s['name']}' has invalid type: '${s['type']}'. Must be 'deterministic' or 'agent'`);
+    }
+    if (s['failureAction'] !== undefined && !validFailureActions.includes(s['failureAction'] as string)) {
+      throw new Error(`Blueprint step '${s['name']}' has invalid failureAction: '${s['failureAction']}'`);
+    }
+  }
+
+  return data as unknown as Blueprint;
 }

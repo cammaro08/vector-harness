@@ -689,7 +689,7 @@ describe('Blueprint Orchestrator', () => {
       expect(result.completedSteps[0].status).toBe('skipped');
     });
 
-    it('handles invalid condition format gracefully', async () => {
+    it('throws on invalid condition format', async () => {
       const blueprint: Blueprint = {
         name: 'Test Blueprint',
         description: 'Test',
@@ -705,15 +705,13 @@ describe('Blueprint Orchestrator', () => {
 
       mockExecutor.mockResolvedValue({ success: true });
 
-      const result = await executeBlueprint({
+      // Should throw error on unparseable condition
+      await expect(executeBlueprint({
         blueprint,
         taskDescription: 'Test task',
         executor: mockExecutor,
         context: {}
-      });
-
-      // Should skip because condition can't be parsed
-      expect(result.completedSteps[0].status).toBe('skipped');
+      })).rejects.toThrow('Invalid condition expression');
     });
 
     it('handles field value as string that parses to number', async () => {
