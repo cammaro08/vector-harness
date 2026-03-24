@@ -1,0 +1,47 @@
+# Five tasks to run through the enforcement harness
+# Each task exercises a different type of work
+tasks:
+  - id: task-1
+    name: "Complete user endpoint"
+    description: "Fix the GET /users/:id to return 404, add DELETE endpoint, add input validation to POST"
+    type: implement-feature
+    success_criteria:
+      - "All tests in user-endpoints.test.ts pass"
+      - "Coverage >= 80%"
+      - "PROGRESS_LOG.md updated"
+
+  - id: task-2
+    name: "Add authentication middleware"
+    description: "Implement requireAuth middleware with JWT verification, implement generateToken"
+    type: implement-feature
+    success_criteria:
+      - "All tests in auth.test.ts pass"
+      - "Auth middleware properly validates tokens"
+      - "Coverage >= 80%"
+
+  - id: task-3
+    name: "Add authorization checks"
+    description: "Add role-based access: only admins can delete users, users can only update their own data"
+    type: implement-feature
+    success_criteria:
+      - "New tests for authorization pass"
+      - "Existing tests still pass"
+      - "Coverage >= 80%"
+
+  - id: task-4
+    name: "Implement error handling"
+    description: "Fix errorHandler middleware to properly respond to errors with correct status codes"
+    type: fix-bug
+    success_criteria:
+      - "All tests in error-handler.test.ts pass"
+      - "Error handler sends responses (not just logs)"
+      - "Coverage >= 80%"
+
+  - id: task-5
+    name: "Update documentation"
+    description: "Create API documentation in docs/, update PROGRESS_LOG.md with implementation notes"
+    type: implement-feature
+    success_criteria:
+      - "docs/API.md created with endpoint documentation"
+      - "docs/PROGRESS_LOG.md updated"
+      - "All existing tests still pass"
