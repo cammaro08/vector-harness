@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stay in the Loop</title>
+  <title>Vector Harness — Join the Waitlist</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -136,13 +136,13 @@
 <body>
   <div class="card">
     <div id="form-section">
-      <div class="badge">Early Access</div>
-      <h1>Stay in the Loop</h1>
-      <p>Get notified when we launch. No spam — just the important stuff.</p>
+      <div class="badge">Beta Waitlist</div>
+      <h1>Test Vector Harness Early</h1>
+      <p>Vector Harness is an enforcement and orchestration layer for AI agent pipelines. Join the waitlist to get early access and help shape what we build.</p>
 
       <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
         <input type="hidden" name="access_key" value="18b0a242-429b-4a7f-86f6-58ac4158aedb" />
-        <input type="hidden" name="subject" value="New signup from landing page" />
+        <input type="hidden" name="subject" value="New Vector Harness waitlist signup" />
         <input type="hidden" name="redirect" value="false" />
         <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
 
@@ -157,18 +157,18 @@
         </div>
 
         <div class="field">
-          <label for="message">Anything you'd like to share? <span style="color:#555">(optional)</span></label>
-          <textarea id="message" name="message" placeholder="How did you hear about us, or what are you hoping for?"></textarea>
+          <label for="usecase">What are you building? <span style="color:#555">(optional)</span></label>
+          <textarea id="usecase" name="message" placeholder="e.g. multi-agent pipeline, LLM evaluation framework, agentic coding assistant…"></textarea>
         </div>
 
-        <button type="submit" id="submit-btn">Notify Me</button>
+        <button type="submit" id="submit-btn">Join the Waitlist</button>
       </form>
     </div>
 
     <div class="success" id="success-section">
       <div class="icon">✅</div>
-      <h2>You're on the list!</h2>
-      <p>Thanks for signing up. We'll reach out as soon as we're ready.</p>
+      <h2>You're on the waitlist!</h2>
+      <p>We'll reach out when your spot opens up. Thanks for your interest in Vector Harness.</p>
     </div>
   </div>
 
@@ -196,12 +196,12 @@
         } else {
           alert('Something went wrong. Please try again.');
           btn.disabled = false;
-          btn.textContent = 'Notify Me';
+          btn.textContent = 'Join the Waitlist';
         }
       } catch {
         alert('Network error. Please try again.');
         btn.disabled = false;
-        btn.textContent = 'Notify Me';
+        btn.textContent = 'Join the Waitlist';
       }
     });
   </script>
