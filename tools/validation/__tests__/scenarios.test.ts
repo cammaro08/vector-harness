@@ -28,26 +28,18 @@ describe('ValidationScenarios', () => {
   describe('each scenario', () => {
     allScenarios.forEach((scenario) => {
       describe(`${scenario.id}`, () => {
-        it('should have non-empty description', () => {
-          expect(scenario.description).toBeTruthy();
-          expect(typeof scenario.description).toBe('string');
-        });
-
-        it('should have non-empty tags array', () => {
-          expect(scenario.tags.length).toBeGreaterThan(0);
-          expect(Array.isArray(scenario.tags)).toBe(true);
-        });
-
-        it('should have valid id', () => {
+        it('should have valid metadata and build a valid EnforcementReport', () => {
+          // Verify scenario metadata
           expect(scenario.id).toBeTruthy();
           expect(typeof scenario.id).toBe('string');
           expect(scenario.id.length).toBeGreaterThan(0);
-        });
+          expect(scenario.description).toBeTruthy();
+          expect(typeof scenario.description).toBe('string');
+          expect(scenario.tags.length).toBeGreaterThan(0);
+          expect(Array.isArray(scenario.tags)).toBe(true);
 
-        it('should build a valid EnforcementReport', () => {
+          // Verify report structure and content
           const report = scenario.buildReport('/test/cwd');
-
-          // Verify report structure
           expect(report).toBeDefined();
           expect(report.id).toBeTruthy();
           expect(report.blueprintName).toBeTruthy();
@@ -60,33 +52,25 @@ describe('ValidationScenarios', () => {
           expect(report.totalDuration).toBeGreaterThanOrEqual(0);
           expect(report.environment).toBeDefined();
           expect(report.environment.cwd).toBe('/test/cwd');
-        });
 
-        it('should compute verdict based on checks', () => {
-          const report = scenario.buildReport('/test/cwd');
+          // Verify verdict is based on checks
           const hasFailedCheck = report.checks.some((c) => c.status === 'failed');
           const expectedVerdict = hasFailedCheck ? 'fail' : 'pass';
           expect(report.verdict).toBe(expectedVerdict);
-        });
 
-        it('should compute totalDuration as sum of check durations', () => {
-          const report = scenario.buildReport('/test/cwd');
+          // Verify totalDuration is sum of check durations
           const summedDuration = report.checks.reduce((sum, check) => sum + check.duration, 0);
           expect(report.totalDuration).toBe(summedDuration);
-        });
 
-        it('should have all checks with valid status and duration', () => {
-          const report = scenario.buildReport('/test/cwd');
+          // Verify all checks have valid status and duration
           report.checks.forEach((check) => {
             expect(['passed', 'failed', 'skipped']).toContain(check.status);
             expect(typeof check.duration).toBe('number');
             expect(check.duration).toBeGreaterThanOrEqual(0);
             expect(check.checkName).toBeTruthy();
           });
-        });
 
-        it('should have all retries with valid attempt history', () => {
-          const report = scenario.buildReport('/test/cwd');
+          // Verify all retries have valid attempt history
           report.retries.forEach((retry) => {
             expect(retry.checkName).toBeTruthy();
             expect(retry.totalAttempts).toBeGreaterThan(0);
@@ -100,10 +84,8 @@ describe('ValidationScenarios', () => {
               expect(typeof attempt.attemptNumber).toBe('number');
             });
           });
-        });
 
-        it('should have escalation if verdict is fail and escalation is defined', () => {
-          const report = scenario.buildReport('/test/cwd');
+          // Verify escalation consistency
           if (report.escalation) {
             expect(report.verdict).toBe('fail');
             expect(report.escalation.reason).toBeTruthy();

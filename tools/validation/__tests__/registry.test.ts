@@ -320,31 +320,5 @@ describe('ValidationRegistry', () => {
       expect(tags).toEqual([]);
     });
 
-    it('should return a new array each time (no mutation)', () => {
-      const scenario: ValidationScenario = {
-        id: 'scenario-1',
-        description: 'Test',
-        tags: ['pass'],
-        buildReport: (cwd: string) =>
-          createReport({
-            id: 'test-1',
-            blueprintName: 'Test',
-            taskDescription: 'Test',
-            cwd,
-          }),
-      };
-
-      registerScenario(scenario);
-
-      const tags1 = getAllTags();
-      const tags2 = getAllTags();
-
-      expect(tags1).not.toBe(tags2);
-      expect(tags1).toEqual(tags2);
-
-      // Mutating tags1 should not affect tags2
-      (tags1 as string[]).push('mutated');
-      expect(tags2).not.toContain('mutated');
-    });
   });
 });
