@@ -54,7 +54,7 @@
 - [x] Write integration tests (full flow, isolation, backward compat)
 - [x] Verify 80%+ coverage across all new files
 - [x] Final commit (7a950ba)
-- [ ] Create PR
+- [x] Create PR (#7)
 
 ## Log
 
