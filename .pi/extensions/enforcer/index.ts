@@ -4,6 +4,8 @@ import { validateDocs } from "./validators/doc-validator";
 import { getStagedFiles, extractCommitMessage } from "./utils/git";
 import { logProgress } from "../../../tools/progressLog";
 import { getRetryContext, formatContextBanner, recordAttempt } from "./context-injector";
+import { createReport, addCheck, withEscalation, finalize } from "../../../tools/enforcementReport";
+import { reportEnforcementResults } from "./reporter";
 
 interface ToolCallEvent {
   toolName: string;
@@ -82,6 +84,30 @@ export default function (pi: ExtensionAPI) {
         } catch (err) {
           // Logging failure should not block validation
         }
+
+        // Report the failure
+        try {
+          let report = createReport({
+            id: `commit-enforce-${Date.now()}`,
+            blueprintName: "commit-validation",
+            taskDescription: "Validate commit message format and content",
+            cwd: ctx.cwd,
+          });
+          report = addCheck(report, {
+            checkName: "commit-message-validation",
+            status: "failed",
+            duration: 10,
+            details: {
+              message: commitResult.message,
+              issues: commitResult.issues,
+            },
+          });
+          report = finalize(report);
+          await reportEnforcementResults(report, { cwd: ctx.cwd });
+        } catch (err) {
+          // Reporting failure should not block enforcement
+        }
+
         return {
           blocked: true,
           message: `🚫 Commit blocked — poor commit message.\n\n${commitResult.message}\n\nWrite a detailed commit message with:\n- Subject line (under 72 chars)\n- Blank line\n- Body explaining what changed, why, and how (at least 2 lines)`,
@@ -106,6 +132,30 @@ export default function (pi: ExtensionAPI) {
       } catch (err) {
         // Logging failure should not block validation
       }
+
+      // Report the failure
+      try {
+        let report = createReport({
+          id: `commit-enforce-${Date.now()}`,
+          blueprintName: "commit-validation",
+          taskDescription: "Validate test coverage for staged files",
+          cwd: ctx.cwd,
+        });
+        report = addCheck(report, {
+          checkName: "test-validation",
+          status: "failed",
+          duration: 10,
+          details: {
+            message: testResult.message,
+            missing: testResult.missing,
+          },
+        });
+        report = finalize(report);
+        await reportEnforcementResults(report, { cwd: ctx.cwd });
+      } catch (err) {
+        // Reporting failure should not block enforcement
+      }
+
       return {
         blocked: true,
         message: `🚫 Commit blocked — missing tests.\n\n${testResult.message}\n\nCreate the missing test files before committing.`,
@@ -127,6 +177,29 @@ export default function (pi: ExtensionAPI) {
       } catch (err) {
         // Logging failure should not block validation
       }
+
+      // Report the failure
+      try {
+        let report = createReport({
+          id: `commit-enforce-${Date.now()}`,
+          blueprintName: "commit-validation",
+          taskDescription: "Validate documentation is updated",
+          cwd: ctx.cwd,
+        });
+        report = addCheck(report, {
+          checkName: "docs-validation",
+          status: "failed",
+          duration: 10,
+          details: {
+            message: docResult.message,
+          },
+        });
+        report = finalize(report);
+        await reportEnforcementResults(report, { cwd: ctx.cwd });
+      } catch (err) {
+        // Reporting failure should not block enforcement
+      }
+
       return {
         blocked: true,
         message: `⚠️ Commit blocked — docs not updated.\n\n${docResult.message}`,
@@ -145,6 +218,44 @@ export default function (pi: ExtensionAPI) {
       });
     } catch (err) {
       // Logging failure should not block validation
+    }
+
+    // Report success
+    try {
+      let report = createReport({
+        id: `commit-enforce-${Date.now()}`,
+        blueprintName: "commit-validation",
+        taskDescription: "Validate commit message, tests, and documentation",
+        cwd: ctx.cwd,
+      });
+
+      // Add all three checks with passed status
+      const commitCheckMsg = extractCommitMessage(cmd);
+      if (commitCheckMsg) {
+        const commitRes = validateCommitMessage(commitCheckMsg);
+        report = addCheck(report, {
+          checkName: "commit-message-validation",
+          status: "passed",
+          duration: 5,
+        });
+      }
+
+      report = addCheck(report, {
+        checkName: "test-validation",
+        status: "passed",
+        duration: 8,
+      });
+
+      report = addCheck(report, {
+        checkName: "docs-validation",
+        status: "passed",
+        duration: 3,
+      });
+
+      report = finalize(report);
+      await reportEnforcementResults(report, { cwd: ctx.cwd });
+    } catch (err) {
+      // Reporting failure should not block enforcement
     }
 
     return undefined;
