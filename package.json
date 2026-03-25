@@ -8,7 +8,10 @@
     "build": "tsc",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "validate": "npx ts-node tools/validation/run.ts",
+    "validate:pass": "npx ts-node tools/validation/run.ts --tag pass",
+    "validate:fail": "npx ts-node tools/validation/run.ts --tag fail"
   },
   "keywords": [],
   "author": "",
