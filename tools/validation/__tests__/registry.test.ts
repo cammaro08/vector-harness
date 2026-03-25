@@ -312,7 +312,7 @@ describe('ValidationRegistry', () => {
       const tags = getAllTags();
 
       expect(tags).toHaveLength(4);
-      expect(tags.sort()).toEqual(['fail', 'pass', 'quick', 'retry']);
+      expect(Array.from(tags).sort()).toEqual(['fail', 'pass', 'quick', 'retry']);
     });
 
     it('should return empty array when no scenarios registered', () => {
