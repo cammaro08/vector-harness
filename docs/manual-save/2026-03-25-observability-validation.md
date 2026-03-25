@@ -30,12 +30,29 @@
 **Why:** Functional decisions made in conversation are lost after the session — this preserves them as a pattern library
 **Outcome:** Created skill at `~/.claude/.agents/skills/manual-instruction-save/` and command at `~/.claude/commands/manual-instruction-save.md`
 
+### 6. Document custom skills in CLAUDE.md
+**What:** Add documentation for `/talha-style` and `/manual-instruction-save` skills to the project CLAUDE.md
+**Why:** Future agents need to know these skills exist and when to use them
+**Outcome:** Added "Custom Skills" section to CLAUDE.md with usage docs for both skills
+
+### 7. Merge all open PRs
+**What:** Merge the full chain of PRs (#8 into feat/observability, #7 into main)
+**Why:** All work is complete — observability pipeline + validation harness ready for main
+**Outcome:** Both PRs merged to main
+
+### 8. Move completed plan to archive folder
+**What:** Move `docs/active-plan/` to `docs/completed/observability-pipeline/`
+**Why:** Work is done — active-plan should only contain in-progress work
+**Outcome:** Created `docs/completed/` as archive for finished plans, moved via PR #9
+
 ## Process Preferences
 
 - Use sonnet sub-agents for implementation work, opus for orchestration
 - Commit after every meaningful change, not just at the end
 - Keep tests lean — consolidate rather than duplicate per-scenario
 - Document extensibility points in CLAUDE.md for future agents
+- Archive completed plans to `docs/completed/<project-name>/` — keep `docs/active-plan/` clean
+- Always create PRs even for housekeeping (main branch is protected)
 
 ## Patterns to Repeat
 
@@ -43,3 +60,5 @@
 - Parallel sub-agent execution for independent implementation tasks
 - Post-implementation cleanup pass to remove agent-generated bloat
 - Updating CLAUDE.md when creating new subsystems that future agents need to know about
+- Run `/manual-instruction-save` at end of session to capture decisions
+- Move completed plans out of active-plan immediately after merging
