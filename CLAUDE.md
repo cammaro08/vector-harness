@@ -114,3 +114,36 @@ tools/validation/
 `pass`, `fail`, `basic`, `retry`, `escalation`, `edge-case`, `stress`
 
 Use tags to filter scenarios: `npx ts-node tools/validation/run.ts --tag retry --tag escalation`
+
+## Custom Skills
+
+### `/talha-style` — TDD Workflow with Sub-Agents
+
+Opinionated workflow for implementing multi-phase plans. Use when working from `docs/active-plan/`.
+
+**Workflow:**
+1. Read `docs/active-plan/plan.md` and `progress.md`
+2. Create tasks for each phase
+3. For each phase, follow strict TDD with **sonnet sub-agents**:
+   - **RED** — sonnet agent writes failing tests
+   - **GREEN** — sonnet agent implements minimal code to pass
+   - **REFACTOR** — sonnet agent reviews and improves
+   - **VERIFY** — run tests, ensure 80%+ coverage
+4. Commit after every meaningful change (detailed messages)
+5. Update `progress.md` after each phase completes
+
+**Sub-agents:** Use sonnet for `tdd-guide`, `code-reviewer`, and `build-error-resolver`. Run agents in parallel when tasks are independent.
+
+### `/manual-instruction-save` — Capture Session Requests
+
+Saves ad-hoc functional requests from a conversation to `docs/manual-save/`. Run at the end of a session to preserve decisions that aren't in any formal plan.
+
+**What it captures:**
+- Functional requests beyond the initial task (e.g., "clean up redundant tests")
+- Process preferences (e.g., "use sonnet sub-agents")
+- Design decisions made during the conversation
+- Patterns that worked and should be repeated
+
+**Output:** One file per conversation at `docs/manual-save/YYYY-MM-DD-<descriptor>.md`
+
+**What it skips:** Routine actions (commit, push), technical implementation details, things already in CLAUDE.md or plan files.
