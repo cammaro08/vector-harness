@@ -521,6 +521,42 @@ This is a feature, not a limitation. Orchestration strategies vary wildly betwee
 
 ---
 
+## Advantages and Disadvantages
+
+### Advantages
+
+**Catches errors before they compound.** In vibe coding, the agent moves fast and breaks things. Without Vector, you discover failures 30 minutes later when the whole thing doesn't work and you don't know which step broke it. With Vector, the failure is caught at the commit or step boundary. The blast radius stays small.
+
+**Makes cheap models viable.** You can vibe code with Haiku or a $3 model instead of Opus. The model will make more mistakes, but Vector catches them immediately and forces a retry. The final output quality is the same — you just pay less to get there.
+
+**Removes the "did it actually work?" anxiety.** In vibe coding you're trusting the agent. You skim the output, you say "looks good," you move on. Vector removes the trust problem — if checks passed, it worked. You can vibe harder because the safety net is real.
+
+**Forces documentation and test hygiene as a side effect.** Nobody writes docs or tests while vibe coding. Vector won't let the agent proceed without them. You get quality artifacts for free, without slowing down the creative flow.
+
+**Reproducible quality across sessions.** Today's vibe coding session might produce great code. Tomorrow's might not — different context, different mood, different model behavior. Vector normalizes the floor. Every session meets the same bar.
+
+### Disadvantages
+
+**It slows things down.** Every commit runs checks. Every conversation end runs checks. `npm test` takes 10 seconds, coverage takes 15, a Playwright smoke takes 30. That adds up. In pure vibe coding, speed IS the point. Vector adds friction to every step.
+
+**Configuration overhead.** Before you can vibe, you need to set up `.vector/config.yaml`, decide which checks matter, wire up the hooks. That's not vibe coding — that's planning. For a throwaway prototype, the setup cost might exceed the value.
+
+**False sense of security.** Checks only catch what they check. If your checks are "tests pass" and "coverage 80%" but your tests are shallow, Vector will happily pass garbage. The quality is only as good as the checks the developer wrote. Vector doesn't know if your checks are good.
+
+**Retry loops can burn tokens.** If the model keeps failing a check, Vector retries 3 times. Each retry is a full agent cycle — reading files, writing code, running tests. On a cheap model that fails often, you might burn more tokens on retries than you would have spent just using a better model once.
+
+**Overkill for exploratory work.** Vibe coding is often "try something, see if it feels right, throw it away if not." Vector enforcing test coverage on throwaway experiments is counterproductive. You'd need to toggle it off for exploration and on for production — which is more cognitive overhead.
+
+### For vibe coding specifically
+
+Vector helps most when you're vibe coding toward something that needs to **actually work and ship** — a real feature, a real API, a real product. It lets you keep the creative speed of vibe coding while guaranteeing the output meets a real bar.
+
+Vector hurts most when you're vibe coding to **explore and prototype** — trying ideas, building throwaway demos, figuring out what you even want. The checks add friction that kills the flow.
+
+The ideal setup: Vector off during exploration, Vector on when you commit to building the real thing. The config stays in the project — you just toggle it.
+
+---
+
 ## Key Decision: Dropped Layer
 
 The original five-layer model included a **Skill Optimizer** layer (Para's closed-loop pattern — blind workers, blind judges, holdout validation). This was removed from Vector's scope. Vector's focus is enforcing work quality, not optimizing agent instructions. Skill optimization can call Vector's protocol, but it isn't a Vector concern.
