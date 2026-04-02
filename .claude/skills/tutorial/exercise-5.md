@@ -178,11 +178,11 @@ Expected output:
 
 ### Checks
 
-| Check | Status | Duration |
-|-------|--------|----------|
-| test-pass | :white_check_mark: Pass | 1234ms |
-| no-ts-errors | :white_check_mark: Pass | 567ms |
-| lint | :white_check_mark: Pass | 890ms |
+| Check | Status | Duration | Details |
+|-------|--------|----------|---------|
+| test-pass | :white_check_mark: Pass | 1234ms | |
+| no-ts-errors | :white_check_mark: Pass | 567ms | |
+| lint | :white_check_mark: Pass | 890ms | |
 
 **Verdict: PASS** — 3 checks, 0 retries
 ```

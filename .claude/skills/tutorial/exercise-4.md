@@ -123,12 +123,7 @@ vectors:
       - test-pass
 ```
 
-Delete the checks:
-
-```bash
-npx vector check remove --name flaky-test
-npx vector check remove --name always-fail
-```
+Edit `.vector/config.yaml` to remove the `flaky-test` and `always-fail` entries from the `checks` block (there is no `check remove` command — just delete the YAML entries manually).
 
 Restore `maxRetries` to 3 in `.vector/config.yaml`:
 
