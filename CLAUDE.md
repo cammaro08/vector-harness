@@ -115,6 +115,48 @@ tools/validation/
 
 Use tags to filter scenarios: `npx ts-node tools/validation/run.ts --tag retry --tag escalation`
 
+## Vector v2 CLI
+
+The project includes a Vector v2 CLI that replaces hardcoded checks with a configurable check registry. Every check is a shell command (exit 0 = pass).
+
+### Quick start
+
+```bash
+# Initialize vector in a project
+npx vector init
+
+# Run checks for a vector
+npx vector run v1
+
+# Add a custom check
+npx vector check add --name lint --run "npm run lint"
+
+# Toggle checks per task
+npx vector activate --check test-pass --on --vector v2
+
+# View the latest report
+npx vector report
+npx vector report --format json
+npx vector report --format markdown
+```
+
+### Configuration
+
+- `.vector/config.yaml` — Project-level check registry and vector definitions
+- `.vector/active.yaml` — Task-level check overrides
+- `.vector/reports/` — JSON report output directory
+
+### Architecture
+
+```
+src/
+├── config/     # Schema, loader, defaults for .vector/*.yaml
+├── protocol/   # Engine that runs checks → EnforcementReport
+├── cli/        # CLI commands (init, run, activate, report, check add)
+├── adapters/   # Claude Code hook integration
+└── reporters/  # Terminal, JSON, PR comment output
+```
+
 ## Custom Skills
 
 ### `/talha-style` — TDD Workflow with Sub-Agents

@@ -41,17 +41,21 @@ export async function writeReportToJSON(
     await mkdir(outputDir, { recursive: true });
 
     // Build envelope with metadata
+    const generatedAt = new Date().toISOString();
     const envelope: EnvelopeData = {
       _meta: {
         version: '1.0.0',
-        generatedAt: new Date().toISOString(),
+        generatedAt,
         generator: 'vector-enforcer',
       },
       report,
     };
 
     // Write file with 2-space indentation
-    const filePath = join(outputDir, 'enforcement-report.json');
+    // Use timestamp-based filename to avoid race conditions with concurrent writes
+    // Format: enforcement-report-YYYY-MM-DDTHH-MM-SS-sssZ.json
+    const timestamp = generatedAt.replace(/[:.]/g, '-');
+    const filePath = join(outputDir, `enforcement-report-${timestamp}.json`);
     const absolutePath = resolve(filePath);
     await writeFile(absolutePath, JSON.stringify(envelope, null, 2));
 
