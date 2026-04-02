@@ -385,4 +385,60 @@ describe('runVector', () => {
       expect(report1.id).not.toBe(report2.id);
     });
   });
+
+  describe('stdout/stderr capture', () => {
+    it('should capture command stdout in check details', async () => {
+      const checks = [
+        {
+          name: 'echo-check',
+          definition: {
+            run: 'echo "test output"',
+            expect: 'exit-0' as const,
+            enabled: true,
+            capture: 'stdout' as const,
+          } as CheckDefinition,
+        },
+      ];
+
+      const report = await runVector({
+        vectorName: 'v1',
+        checks,
+        maxRetries: 0,
+        timeout: 5000,
+        environment: {
+          cwd: process.cwd(),
+        },
+      });
+
+      expect(report.verdict).toBe('pass');
+      expect(report.checks[0].status).toBe('passed');
+      expect(report.checks[0].details?.message).toBeDefined();
+    });
+
+    it('should include maxRetries=0 in total attempts calculation', async () => {
+      const checks = [
+        {
+          name: 'no-retry-check',
+          definition: {
+            run: 'exit 0',
+            expect: 'exit-0' as const,
+            enabled: true,
+          } as CheckDefinition,
+        },
+      ];
+
+      const report = await runVector({
+        vectorName: 'v1',
+        checks,
+        maxRetries: 0,
+        timeout: 5000,
+        environment: {
+          cwd: process.cwd(),
+        },
+      });
+
+      expect(report.verdict).toBe('pass');
+      expect(report.retries).toHaveLength(0);
+    });
+  });
 });

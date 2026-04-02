@@ -17,6 +17,18 @@ import {
 } from './schema';
 
 /**
+ * Type guard to check if an error is a Node.js system error with a code property.
+ */
+function isNodeError(error: unknown): error is NodeJS.ErrnoException {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as any).code === 'string'
+  );
+}
+
+/**
  * Loads the project configuration from .vector/config.yaml
  * Parses YAML and validates against VectorConfig schema.
  *
@@ -32,7 +44,7 @@ export function loadProjectConfig(projectRoot: string): VectorConfig {
   try {
     fileContent = fs.readFileSync(configPath, 'utf-8');
   } catch (error) {
-    if ((error as any).code === 'ENOENT') {
+    if (isNodeError(error) && error.code === 'ENOENT') {
       throw new Error(
         `Project config not found at ${configPath}. Create .vector/config.yaml in your project root.`
       );
@@ -67,7 +79,7 @@ export function loadActiveConfig(projectRoot: string): ActiveConfig | null {
   try {
     fileContent = fs.readFileSync(activePath, 'utf-8');
   } catch (error) {
-    if ((error as any).code === 'ENOENT') {
+    if (isNodeError(error) && error.code === 'ENOENT') {
       return null;
     }
     throw error;

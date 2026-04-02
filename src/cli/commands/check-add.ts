@@ -10,11 +10,27 @@ import * as yaml from 'js-yaml';
 import { loadProjectConfig } from '../../config';
 
 /**
- * Validate check name format.
- * Check names should be lowercase alphanumeric with hyphens only.
+ * Validate check name format and length.
+ * Check names should be lowercase alphanumeric with hyphens only, 1-64 chars.
  */
 function validateCheckName(name: string): boolean {
+  const MAX_NAME_LENGTH = 64;
+  if (!name || name.length > MAX_NAME_LENGTH) {
+    return false;
+  }
   return /^[a-z0-9][a-z0-9-]*$/.test(name);
+}
+
+/**
+ * Validate run command.
+ * Run commands must not be empty or excessively long.
+ */
+function validateRunCommand(command: string): boolean {
+  const MAX_COMMAND_LENGTH = 4096;
+  if (!command || command.trim().length === 0 || command.length > MAX_COMMAND_LENGTH) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -51,7 +67,15 @@ export async function checkAddCommand(
     // Validate check name format
     if (!validateCheckName(checkName)) {
       console.error(
-        `[vector] check add: check name '${checkName}' is invalid. Use lowercase alphanumeric characters and hyphens only.`
+        `[vector] check add: check name '${checkName}' is invalid. Use lowercase alphanumeric characters and hyphens only (1-64 chars).`
+      );
+      return 1;
+    }
+
+    // Validate run command
+    if (!validateRunCommand(runCommand)) {
+      console.error(
+        `[vector] check add: run command is invalid or too long (max 4096 chars).`
       );
       return 1;
     }

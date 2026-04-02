@@ -45,9 +45,12 @@ export function validateConfig(data: unknown): VectorConfig {
 
   // Check version
   if (data.version !== '2') {
-    throw new Error(
-      `Config version must be '2', got '${data.version || 'undefined'}'`
-    );
+    const version = data.version || 'undefined';
+    const message =
+      version !== 'undefined' && version > '2'
+        ? `Config version '${version}' is not supported by this version of Vector. Please upgrade Vector to use this config.`
+        : `Config version must be '2', got '${version}'`;
+    throw new Error(message);
   }
 
   // Check checks
@@ -77,8 +80,23 @@ export function validateConfig(data: unknown): VectorConfig {
     throw new Error('Config.defaults.maxRetries must be a number');
   }
 
+  if (data.defaults.maxRetries < 0) {
+    throw new Error('Config.defaults.maxRetries must be non-negative');
+  }
+
   if (typeof data.defaults.timeout !== 'number') {
     throw new Error('Config.defaults.timeout must be a number');
+  }
+
+  if (data.defaults.timeout <= 0) {
+    throw new Error('Config.defaults.timeout must be positive (greater than 0)');
+  }
+
+  if (data.defaults.timeout > 3600000) {
+    // 1 hour in milliseconds
+    throw new Error(
+      'Config.defaults.timeout is too large (max 1 hour / 3,600,000 ms)'
+    );
   }
 
   // Return as VectorConfig after all validations pass
