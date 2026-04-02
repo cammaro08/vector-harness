@@ -1,0 +1,26 @@
+Created /tmp/vector-demo-1-ec7QvD/.vector/config.yaml
+Created/updated /tmp/vector-demo-1-ec7QvD/.claude/settings.local.json
+✓ Vector project initialized
+
+--- VECTOR RUN OUTPUT ---
+
+[vector] Running vector 'v1' with 2 check(s):
+  - echo-hello: "echo "Hello, World!"" (enabled)
+  - true-check: "true" (enabled)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v1
+Task:      Running vector v1
+
+CHECKS
+  [PASS] echo-hello ................... 40ms
+  [PASS] true-check ................... 31ms
+
+VERDICT: PASS (2 checks, 71ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] All checks passed.
+

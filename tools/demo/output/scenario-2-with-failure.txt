@@ -1,0 +1,38 @@
+Created /tmp/vector-demo-2-eFayk7/.vector/config.yaml
+Created/updated /tmp/vector-demo-2-eFayk7/.claude/settings.local.json
+✓ Vector project initialized
+
+--- VECTOR RUN OUTPUT ---
+
+[vector] Running vector 'v1' with 2 check(s):
+  - passing-check: "echo "This passes"" (enabled)
+  - failing-check: "exit 1" (enabled)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v1
+Task:      Running vector v1
+
+CHECKS
+  [PASS] passing-check ................ 41ms
+  [FAIL] failing-check ................ 11ms
+         Command exited with code 1
+
+RETRIES
+  failing-check: 4 attempts
+    #1 FAIL (38ms): Command exited with code 1
+    #2 FAIL (28ms): Command exited with code 1
+    #3 FAIL (14ms): Command exited with code 1
+    #4 FAIL (11ms): Command exited with code 1
+
+ESCALATION
+  Reason:     Check 'failing-check' failed after 4 attempts
+  Suggestion: Review the check configuration or the underlying command: exit 1
+
+VERDICT: FAIL (2 checks, 1 retry, 52ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] Some checks failed. See report above.
+

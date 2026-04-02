@@ -1,0 +1,84 @@
+Created /tmp/vector-demo-3-OvTj7m/.vector/config.yaml
+Created/updated /tmp/vector-demo-3-OvTj7m/.claude/settings.local.json
+✓ Vector project initialized
+
+--- RUN 1: BOTH CHECKS ENABLED (SHOULD FAIL) ---
+
+[vector] Running vector 'v1' with 2 check(s):
+  - passing-check: "true" (enabled)
+  - failing-check: "exit 1" (enabled)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v1
+Task:      Running vector v1
+
+CHECKS
+  [PASS] passing-check ................ 11ms
+  [FAIL] failing-check ................ 6ms
+         Command exited with code 1
+
+RETRIES
+  failing-check: 4 attempts
+    #1 FAIL (7ms): Command exited with code 1
+    #2 FAIL (14ms): Command exited with code 1
+    #3 FAIL (6ms): Command exited with code 1
+    #4 FAIL (6ms): Command exited with code 1
+
+ESCALATION
+  Reason:     Check 'failing-check' failed after 4 attempts
+  Suggestion: Review the check configuration or the underlying command: exit 1
+
+VERDICT: FAIL (2 checks, 1 retry, 17ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] Some checks failed. See report above.
+
+
+--- ACTIVATE: DISABLE FAILING CHECK ---
+[vector] Disabled check 'failing-check' for vector 'v1'
+[vector] Active checks for v1: (none — will use project defaults)
+
+--- RUN 2: ONLY PASSING CHECK (SHOULD PASS) ---
+
+[vector] Running vector 'v1' with 0 check(s):
+
+
+--- RE-ENABLE: ENABLE FAILING CHECK ---
+[vector] Enabled check 'failing-check' for vector 'v1'
+[vector] Active checks for v1: failing-check
+
+--- RUN 3: BOTH CHECKS ENABLED AGAIN (SHOULD FAIL) ---
+
+[vector] Running vector 'v1' with 1 check(s):
+  - failing-check: "exit 1" (enabled)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v1
+Task:      Running vector v1
+
+CHECKS
+  [FAIL] failing-check ................ 8ms
+         Command exited with code 1
+
+RETRIES
+  failing-check: 4 attempts
+    #1 FAIL (9ms): Command exited with code 1
+    #2 FAIL (6ms): Command exited with code 1
+    #3 FAIL (12ms): Command exited with code 1
+    #4 FAIL (8ms): Command exited with code 1
+
+ESCALATION
+  Reason:     Check 'failing-check' failed after 4 attempts
+  Suggestion: Review the check configuration or the underlying command: exit 1
+
+VERDICT: FAIL (1 check, 1 retry, 8ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] Some checks failed. See report above.
+

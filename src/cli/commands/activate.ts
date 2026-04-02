@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { loadActiveConfig } from '../../config';
-import { ActiveConfig } from '../../config/schema';
+import { ActiveConfig, VectorName } from '../../config/schema';
 
 /**
  * Activate/deactivate a check for a vector.
@@ -55,25 +55,29 @@ export async function activateCommand(
     }
 
     // Ensure vector exists in active config
-    if (!active.vectors[vectorName as any]) {
-      active.vectors[vectorName as any] = [];
+    const vn = vectorName as VectorName;
+    if (!active.vectors[vn]) {
+      active.vectors[vn] = [];
     }
 
-    const checks = active.vectors[vectorName as any] as string[];
+    const checks = active.vectors[vn] as string[];
 
     // Toggle the check
     if (isOn) {
       if (!checks.includes(checkName)) {
         checks.push(checkName);
       }
-      console.log(`✓ Enabled check '${checkName}' for vector '${vectorName}'`);
+      console.log(`[vector] Enabled check '${checkName}' for vector '${vectorName}'`);
     } else if (isOff) {
       const index = checks.indexOf(checkName);
       if (index !== -1) {
         checks.splice(index, 1);
       }
-      console.log(`✓ Disabled check '${checkName}' for vector '${vectorName}'`);
+      console.log(`[vector] Disabled check '${checkName}' for vector '${vectorName}'`);
     }
+
+    // Show current active checks for this vector
+    console.log(`[vector] Active checks for ${vectorName}: ${checks.length > 0 ? checks.join(', ') : '(none — will use project defaults)'}`);
 
     // Write back to active.yaml
     const vectorDir = path.join(projectRoot, '.vector');

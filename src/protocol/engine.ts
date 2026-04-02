@@ -78,10 +78,11 @@ export async function runVector(options: EngineOptions): Promise<EnforcementRepo
         };
       }
 
-      // Track attempt
+      // Track attempt (runner only returns 'passed'|'failed', never 'skipped')
+      const attemptStatus = checkResult.status as 'passed' | 'failed';
       attemptHistory.push({
         attemptNumber: attempt,
-        status: checkResult.status,
+        status: attemptStatus,
         duration: checkResult.duration,
         error: checkResult.status === 'failed' ? checkResult.details?.message : undefined,
       });
@@ -108,7 +109,7 @@ export async function runVector(options: EngineOptions): Promise<EnforcementRepo
           checkName: name,
           totalAttempts: attemptHistory.length,
           succeededAtAttempt,
-          finalStatus: lastResult.status,
+          finalStatus: lastResult.status as 'passed' | 'failed',
           attemptHistory: attemptHistory,
         });
 

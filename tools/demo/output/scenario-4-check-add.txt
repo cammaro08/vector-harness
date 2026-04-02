@@ -1,0 +1,47 @@
+
+=== SCENARIO 4: Check add ===
+Baseline config created
+
+--- ADD CHECK OUTPUT ---
+✓ Added check 'custom-check'
+
+--- CONFIG.YAML CONTENT AFTER ADD ---
+version: '2'
+checks:
+  baseline-check:
+    run: echo "Baseline check"
+    expect: exit-0
+    enabled: true
+  custom-check:
+    run: echo "This is a custom check"
+    expect: exit-0
+    enabled: true
+vectors:
+  v1:
+    trigger: Demo vector with custom checks
+    checks:
+      - baseline-check
+defaults:
+  maxRetries: 3
+  timeout: 30000
+
+--- RUN WITH BOTH CHECKS ---
+
+[vector] Running vector 'v1' with 1 check(s):
+  - baseline-check: "echo "Baseline check"" (enabled)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v1
+Task:      Running vector v1
+
+CHECKS
+  [PASS] baseline-check ............... 6ms
+
+VERDICT: PASS (1 check, 6ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] All checks passed.
+
