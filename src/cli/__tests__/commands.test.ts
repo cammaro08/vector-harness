@@ -24,7 +24,7 @@ describe('CLI Commands', () => {
 
   describe('initCommand', () => {
     it('creates .vector directory and config.yaml', async () => {
-      const exitCode = await initCommand(tempDir);
+      const exitCode = await initCommand({ yes: true }, tempDir);
 
       expect(exitCode).toBe(0);
       expect(fs.existsSync(path.join(tempDir, '.vector'))).toBe(true);
@@ -34,7 +34,7 @@ describe('CLI Commands', () => {
     });
 
     it('writes valid YAML config file', async () => {
-      await initCommand(tempDir);
+      await initCommand({ yes: true }, tempDir);
 
       const configPath = path.join(tempDir, '.vector', 'config.yaml');
       const content = fs.readFileSync(configPath, 'utf-8');
@@ -47,7 +47,7 @@ describe('CLI Commands', () => {
     });
 
     it('creates .claude/settings.local.json with hook config', async () => {
-      await initCommand(tempDir);
+      await initCommand({ yes: true }, tempDir);
 
       const settingsPath = path.join(
         tempDir,
@@ -73,7 +73,7 @@ describe('CLI Commands', () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Run init again
-      const exitCode = await initCommand(tempDir);
+      const exitCode = await initCommand({ yes: true }, tempDir);
 
       expect(exitCode).toBe(0);
       const newMtime = fs.statSync(configPath).mtime;
@@ -81,7 +81,7 @@ describe('CLI Commands', () => {
     });
 
     it('returns 0 on success', async () => {
-      const exitCode = await initCommand(tempDir);
+      const exitCode = await initCommand({ yes: true }, tempDir);
       expect(exitCode).toBe(0);
     });
   });
@@ -166,7 +166,7 @@ describe('CLI Commands', () => {
 
   describe('activateCommand', () => {
     beforeEach(async () => {
-      await initCommand(tempDir);
+      await initCommand({ yes: true }, tempDir);
     });
 
     it('creates active.yaml with check override', async () => {
@@ -302,7 +302,7 @@ describe('CLI Commands', () => {
 
   describe('checkAddCommand', () => {
     beforeEach(async () => {
-      await initCommand(tempDir);
+      await initCommand({ yes: true }, tempDir);
     });
 
     it('adds a new check to config.yaml', async () => {
