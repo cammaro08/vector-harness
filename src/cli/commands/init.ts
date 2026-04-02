@@ -85,7 +85,7 @@ export async function initCommand(projectRoot: string): Promise<number> {
     return 0;
   } catch (error) {
     console.error(
-      `Failed to initialize Vector project: ${(error as Error).message}`
+      `[vector] init: ${(error as Error).message}`
     );
     return 1;
   }

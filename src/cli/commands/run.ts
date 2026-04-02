@@ -136,7 +136,7 @@ export async function runCommand(
     // Return appropriate exit code based on verdict
     return report.verdict === 'pass' ? 0 : 1;
   } catch (error) {
-    console.error(`[vector] Failed to run vector: ${(error as Error).message}`);
+    console.error(`[vector] run: ${(error as Error).message}`);
     return 1;
   }
 }

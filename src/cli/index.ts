@@ -118,6 +118,7 @@ export async function main(argv?: string[]): Promise<number> {
 
   // Check for empty command
   if (!parsed.command) {
+    console.error('[vector]: no command specified');
     console.error('Usage: vector <command> [options]');
     console.error('Commands: init, run, activate, report, check');
     console.error('Run "vector <command> --help" for more information.');
@@ -131,7 +132,7 @@ export async function main(argv?: string[]): Promise<number> {
 
       case 'run': {
         if (parsed.positional.length === 0) {
-          console.error('Error: run command requires a vector name');
+          console.error('[vector] run: missing vector name');
           console.error('Usage: vector run <vector-name>');
           return 1;
         }
@@ -149,20 +150,20 @@ export async function main(argv?: string[]): Promise<number> {
         if (parsed.subcommand === 'add') {
           return await checkAddCommand(parsed.flags, projectRoot);
         }
-        console.error(`Error: unknown check subcommand '${parsed.subcommand}'`);
+        console.error(`[vector] check: unknown subcommand '${parsed.subcommand}'`);
         console.error('Usage: vector check add --name <name> --run <command>');
         return 1;
       }
 
       default:
-        console.error(`Error: unknown command '${parsed.command}'`);
+        console.error(`[vector]: unknown command '${parsed.command}'`);
         console.error(
           'Usage: vector <init|run|activate|report|check> [options]'
         );
         return 1;
     }
   } catch (error) {
-    console.error(`Error: ${(error as Error).message}`);
+    console.error(`[vector]: ${(error as Error).message}`);
     return 1;
   }
 }

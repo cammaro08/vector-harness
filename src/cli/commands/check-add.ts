@@ -39,19 +39,19 @@ export async function checkAddCommand(
     const force = flags.force === true;
 
     if (!checkName) {
-      console.error('Error: --name flag is required');
+      console.error('[vector] check add: --name flag is required');
       return 1;
     }
 
     if (!runCommand) {
-      console.error('Error: --run flag is required');
+      console.error('[vector] check add: --run flag is required');
       return 1;
     }
 
     // Validate check name format
     if (!validateCheckName(checkName)) {
       console.error(
-        `Error: check name '${checkName}' is invalid. Use lowercase alphanumeric characters and hyphens only.`
+        `[vector] check add: check name '${checkName}' is invalid. Use lowercase alphanumeric characters and hyphens only.`
       );
       return 1;
     }
@@ -63,7 +63,7 @@ export async function checkAddCommand(
     if (config.checks[checkName]) {
       if (!force) {
         console.error(
-          `Error: check '${checkName}' already exists. Use --force to overwrite.`
+          `[vector] check add: check '${checkName}' already exists. Use --force to overwrite.`
         );
         return 1;
       }
@@ -88,7 +88,7 @@ export async function checkAddCommand(
     console.log(`✓ Added check '${checkName}'`);
     return 0;
   } catch (error) {
-    console.error(`Failed to add check: ${(error as Error).message}`);
+    console.error(`[vector] check add: ${(error as Error).message}`);
     return 1;
   }
 }

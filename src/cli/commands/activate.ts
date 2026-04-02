@@ -34,17 +34,17 @@ export async function activateCommand(
     const isOff = flags.off === true;
 
     if (!checkName) {
-      console.error('Error: --check flag is required');
+      console.error('[vector] activate: --check flag is required');
       return 1;
     }
 
     if (!vectorName) {
-      console.error('Error: --vector flag is required');
+      console.error('[vector] activate: --vector flag is required');
       return 1;
     }
 
     if (!isOn && !isOff) {
-      console.error('Error: either --on or --off flag is required');
+      console.error('[vector] activate: either --on or --off flag is required');
       return 1;
     }
 
@@ -56,8 +56,9 @@ export async function activateCommand(
     } catch (error) {
       const activePath = path.join(projectRoot, '.vector', 'active.yaml');
       console.error(
-        `Failed to load active config at ${activePath}: ${(error as Error).message}\n` +
-        `Try deleting the file and running 'vector activate' again.`
+        `[vector] activate: Failed to load active config at ${activePath}\n` +
+        `[vector] activate: ${(error as Error).message}\n` +
+        `[vector] activate: Try deleting the file and running 'vector activate' again.`
       );
       return 1;
     }
@@ -100,7 +101,7 @@ export async function activateCommand(
 
     return 0;
   } catch (error) {
-    console.error(`Failed to activate check: ${(error as Error).message}`);
+    console.error(`[vector] activate: ${(error as Error).message}`);
     return 1;
   }
 }

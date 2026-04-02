@@ -48,7 +48,7 @@ export async function reportCommand(
 
     // Check if report was found
     if (!reportPath || !fs.existsSync(reportPath)) {
-      console.error('No reports found');
+      console.error('[vector] report: no reports found');
       return 1;
     }
 
@@ -56,7 +56,7 @@ export async function reportCommand(
     const readResult = await readReportFromJSON(reportPath);
 
     if (!readResult.success) {
-      console.error(`Failed to read report: ${readResult.error}`);
+      console.error(`[vector] report: failed to read report: ${readResult.error}`);
       return 1;
     }
 
@@ -85,7 +85,7 @@ export async function reportCommand(
       }
     }
   } catch (error) {
-    console.error(`Failed to display report: ${(error as Error).message}`);
+    console.error(`[vector] report: ${(error as Error).message}`);
     return 1;
   }
 }
