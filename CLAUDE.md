@@ -157,14 +157,67 @@ src/
 └── reporters/  # Terminal, JSON, PR comment output
 ```
 
+## Planning Workflow
+
+Use `plans/` for all multi-phase work. Each plan lives in its own folder with a `plan.md` and `progress.md`.
+
+### Directory structure
+
+```
+plans/
+└── <plan-name>/
+    ├── plan.md          # What to build, phases, acceptance criteria
+    └── progress.md      # Phase status table, log of completions
+```
+
+### Creating a plan
+
+1. Create `plans/<plan-name>/plan.md` with:
+   - **Objective** — what you're building and why
+   - **Prerequisites** — what's needed before starting
+   - **File Structure** — what files will be created or modified
+   - **Phases** — numbered phases, each with file targets, content requirements, and design notes
+   - **Acceptance Criteria** — checklist of what "done" means
+
+2. Create `plans/<plan-name>/progress.md` with:
+   ```markdown
+   # Progress: <Plan Name>
+
+   ## Status: PLANNED
+
+   ## Phases
+
+   | # | Phase | Status | Notes |
+   |---|-------|--------|-------|
+   | 1 | Phase description | Not Started | |
+   | 2 | Phase description | Not Started | |
+
+   ## Log
+
+   - YYYY-MM-DD: Plan created
+   ```
+
+### Working a plan
+
+1. Read `plan.md` and `progress.md`
+2. Create tasks for each phase
+3. Implement each phase (use sub-agents for parallel work)
+4. Commit after every meaningful change
+5. Update `progress.md` after each phase completes — set status to `Done` with notes
+6. When all phases are done, set `## Status: COMPLETE` and add a log entry
+
+### Branch convention
+
+Create a feature branch named after the plan: `feat/<plan-name>`
+
 ## Custom Skills
 
 ### `/talha-style` — TDD Workflow with Sub-Agents
 
-Opinionated workflow for implementing multi-phase plans. Use when working from `docs/active-plan/`.
+Opinionated workflow for implementing multi-phase plans. Use when working from `plans/<plan-name>/`.
 
 **Workflow:**
-1. Read `docs/active-plan/plan.md` and `progress.md`
+1. Read `plans/<plan-name>/plan.md` and `progress.md`
 2. Create tasks for each phase
 3. For each phase, follow strict TDD with **sonnet sub-agents**:
    - **RED** — sonnet agent writes failing tests
