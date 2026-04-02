@@ -52,6 +52,9 @@ export async function reportCommand(
       return 1;
     }
 
+    // Log which report we're reading
+    console.log(`[vector] Loading report: ${reportPath}`);
+
     // Read the report
     const readResult = await readReportFromJSON(reportPath);
 

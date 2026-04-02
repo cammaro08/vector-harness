@@ -98,6 +98,7 @@ export async function activateCommand(
       lineWidth: -1,
     });
     fs.writeFileSync(activePath, yaml_str, 'utf-8');
+    console.log(`[vector] Saved active configuration to ${activePath}`);
 
     return 0;
   } catch (error) {

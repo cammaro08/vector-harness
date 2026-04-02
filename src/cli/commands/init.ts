@@ -9,6 +9,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { generateDefaultConfigYaml } from '../../config';
 
+// Default hook configuration for Claude Code integration
+const DEFAULT_HOOK_COMMAND = 'npx vector run v1';
+const HOOK_TYPE = 'command';
+
 /**
  * Initialize a Vector project.
  *
@@ -61,14 +65,14 @@ export async function initCommand(projectRoot: string): Promise<number> {
 
     // Merge Stop hook instead of overwriting
     const vectorHook = {
-      type: 'command',
-      command: 'npx vector run v1',
+      type: HOOK_TYPE,
+      command: DEFAULT_HOOK_COMMAND,
     };
 
     if (Array.isArray(settings.hooks.Stop)) {
       // Check if vector hook already exists
       const alreadyExists = settings.hooks.Stop.some(
-        (hook: any) => hook.command === 'npx vector run v1'
+        (hook: any) => hook.command === DEFAULT_HOOK_COMMAND
       );
       if (!alreadyExists) {
         settings.hooks.Stop.push(vectorHook);
