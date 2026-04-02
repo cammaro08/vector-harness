@@ -6,8 +6,9 @@
  */
 
 import * as path from 'path';
+import { execSync } from 'child_process';
 import { VectorName } from '../config/schema';
-import { loadProjectConfig, loadActiveConfig, resolveChecksForVector } from '../config/loader';
+import { loadProjectConfig, loadActiveConfig, resolveNamedChecksForVector } from '../config/loader';
 import { runVector } from '../protocol/engine';
 import { EnforcementReport, EnvironmentInfo } from '../protocol/types';
 import { formatReport } from '../../tools/terminalReporter';
@@ -46,22 +47,31 @@ export async function runAdapter(options: AdapterOptions): Promise<AdapterResult
   // Load active config (optional)
   const activeConfig = loadActiveConfig(projectRoot);
 
-  // Resolve checks for the vector
-  const checkDefinitions = resolveChecksForVector(config, activeConfig, vectorName);
+  // Resolve checks for the vector (respects active config overrides)
+  // This returns Array<{ name: string; definition: CheckDefinition }>
+  const checks = resolveNamedChecksForVector(config, activeConfig, vectorName);
 
-  // Convert check definitions to engine format: name -> definition
-  const checks = checkDefinitions.map((definition, index) => {
-    // Try to find the check name from the vector definition
-    const vectorDef = config.vectors[vectorName];
-    const checkName = vectorDef && vectorDef.checks[index] ? vectorDef.checks[index] : `check-${index}`;
-    return { name: checkName, definition };
-  });
+  // Detect git info from the current working directory
+  let gitBranch = 'unknown';
+  let gitCommit = 'unknown';
+  try {
+    gitBranch = execSync('git rev-parse --abbrev-ref HEAD', {
+      cwd: projectRoot,
+      encoding: 'utf-8',
+    }).trim();
+    gitCommit = execSync('git rev-parse --short HEAD', {
+      cwd: projectRoot,
+      encoding: 'utf-8',
+    }).trim();
+  } catch {
+    // Git detection failed; use defaults
+  }
 
   // Build environment info
   const environment: EnvironmentInfo = {
     cwd: projectRoot,
-    gitBranch: 'unknown',
-    gitCommit: 'unknown',
+    gitBranch,
+    gitCommit,
   };
 
   // Run the vector engine

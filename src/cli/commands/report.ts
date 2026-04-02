@@ -30,10 +30,24 @@ export async function reportCommand(
 ): Promise<number> {
   try {
     const reportsDir = path.join(projectRoot, '.vector', 'reports');
-    const reportPath = path.join(reportsDir, 'enforcement-report.json');
 
-    // Check if report exists
-    if (!fs.existsSync(reportPath)) {
+    // Find the latest report file
+    let reportPath: string | null = null;
+    if (fs.existsSync(reportsDir)) {
+      const files = fs.readdirSync(reportsDir);
+      // Look for enforcement-report-*.json files, sorted by name (timestamp)
+      const reportFiles = files
+        .filter((f) => f.startsWith('enforcement-report-') && f.endsWith('.json'))
+        .sort()
+        .reverse(); // Reverse to get latest first (lexicographically, timestamps sort correctly)
+
+      if (reportFiles.length > 0) {
+        reportPath = path.join(reportsDir, reportFiles[0]);
+      }
+    }
+
+    // Check if report was found
+    if (!reportPath || !fs.existsSync(reportPath)) {
       console.error('No reports found');
       return 1;
     }

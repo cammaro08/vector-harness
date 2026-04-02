@@ -82,7 +82,8 @@ export function validateConfig(data: unknown): VectorConfig {
   }
 
   // Return as VectorConfig after all validations pass
-  return data as unknown as VectorConfig;
+  // All fields have been validated above; this single cast is safe
+  return data as VectorConfig;
 }
 
 /**
@@ -115,7 +116,9 @@ export function validateActiveConfig(data: unknown): ActiveConfig {
     }
   }
 
-  return data as unknown as ActiveConfig;
+  // Return as ActiveConfig after all validations pass
+  // All fields have been validated above; this single cast is safe
+  return data as ActiveConfig;
 }
 
 // ============================================================================

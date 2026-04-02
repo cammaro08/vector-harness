@@ -10,13 +10,22 @@ import * as yaml from 'js-yaml';
 import { loadProjectConfig } from '../../config';
 
 /**
+ * Validate check name format.
+ * Check names should be lowercase alphanumeric with hyphens only.
+ */
+function validateCheckName(name: string): boolean {
+  return /^[a-z0-9][a-z0-9-]*$/.test(name);
+}
+
+/**
  * Add a new check to the configuration.
  *
  * Reads config.yaml, adds the check, and writes back.
  *
  * Flags:
- * - --name <name>: check name
- * - --run <command>: shell command to execute
+ * - --name <name>: check name (required, lowercase alphanumeric + hyphens)
+ * - --run <command>: shell command to execute (required)
+ * - --force: overwrite check if it already exists (optional)
  *
  * Returns 0 on success, 1 on failure.
  */
@@ -27,6 +36,7 @@ export async function checkAddCommand(
   try {
     const checkName = flags.name as string;
     const runCommand = flags.run as string;
+    const force = flags.force === true;
 
     if (!checkName) {
       console.error('Error: --name flag is required');
@@ -38,13 +48,26 @@ export async function checkAddCommand(
       return 1;
     }
 
+    // Validate check name format
+    if (!validateCheckName(checkName)) {
+      console.error(
+        `Error: check name '${checkName}' is invalid. Use lowercase alphanumeric characters and hyphens only.`
+      );
+      return 1;
+    }
+
     // Load current config
     const config = loadProjectConfig(projectRoot);
 
     // Check if check already exists
     if (config.checks[checkName]) {
-      console.error(`Error: check '${checkName}' already exists`);
-      return 1;
+      if (!force) {
+        console.error(
+          `Error: check '${checkName}' already exists. Use --force to overwrite.`
+        );
+        return 1;
+      }
+      console.log(`[vector] Overwriting existing check '${checkName}'`);
     }
 
     // Add the new check

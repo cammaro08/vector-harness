@@ -59,13 +59,24 @@ export async function initCommand(projectRoot: string): Promise<number> {
       settings.hooks = {};
     }
 
-    // Set up Stop hook
-    settings.hooks.Stop = [
-      {
-        type: 'command',
-        command: 'npx vector run v1',
-      },
-    ];
+    // Merge Stop hook instead of overwriting
+    const vectorHook = {
+      type: 'command',
+      command: 'npx vector run v1',
+    };
+
+    if (Array.isArray(settings.hooks.Stop)) {
+      // Check if vector hook already exists
+      const alreadyExists = settings.hooks.Stop.some(
+        (hook: any) => hook.command === 'npx vector run v1'
+      );
+      if (!alreadyExists) {
+        settings.hooks.Stop.push(vectorHook);
+      }
+    } else {
+      // Create Stop hook with vector command
+      settings.hooks.Stop = [vectorHook];
+    }
 
     fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
     console.log(`Created/updated ${settingsPath}`);

@@ -115,3 +115,29 @@ export function resolveChecksForVector(
   // Return immutable copy
   return checks.map((check) => ({ ...check }));
 }
+
+/**
+ * Resolve check names and definitions for a vector, respecting active overrides.
+ * Returns array of { name, definition } pairs.
+ */
+export function resolveNamedChecksForVector(
+  config: VectorConfig,
+  active: ActiveConfig | null,
+  vector: VectorName
+): Array<{ name: string; definition: CheckDefinition }> {
+  // Determine which check names to use
+  const checkNames: string[] =
+    active && vector in active.vectors
+      ? active.vectors[vector] || []
+      : config.vectors[vector]?.checks || [];
+
+  // Warn if any check names are not found in the config
+  const missingChecks = checkNames.filter((name) => config.checks[name] === undefined);
+  if (missingChecks.length > 0) {
+    console.warn(`[vector] Warning: Vector '${vector}' references missing checks: ${missingChecks.join(', ')}`);
+  }
+
+  return checkNames
+    .filter((name) => config.checks[name] !== undefined)
+    .map((name) => ({ name, definition: { ...config.checks[name] } }));
+}

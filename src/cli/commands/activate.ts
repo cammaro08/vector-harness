@@ -49,9 +49,17 @@ export async function activateCommand(
     }
 
     // Load or create active config
-    let active = loadActiveConfig(projectRoot);
-    if (!active) {
-      active = { vectors: {} };
+    let active: ActiveConfig;
+    try {
+      const loaded = loadActiveConfig(projectRoot);
+      active = loaded || { vectors: {} };
+    } catch (error) {
+      const activePath = path.join(projectRoot, '.vector', 'active.yaml');
+      console.error(
+        `Failed to load active config at ${activePath}: ${(error as Error).message}\n` +
+        `Try deleting the file and running 'vector activate' again.`
+      );
+      return 1;
     }
 
     // Ensure vector exists in active config

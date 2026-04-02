@@ -116,6 +116,14 @@ export async function main(argv?: string[]): Promise<number> {
 
   const parsed = parseArgs(args);
 
+  // Check for empty command
+  if (!parsed.command) {
+    console.error('Usage: vector <command> [options]');
+    console.error('Commands: init, run, activate, report, check');
+    console.error('Run "vector <command> --help" for more information.');
+    return 1;
+  }
+
   try {
     switch (parsed.command) {
       case 'init':

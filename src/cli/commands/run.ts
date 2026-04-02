@@ -83,14 +83,14 @@ export async function runCommand(
 
     if (namedChecks.length === 0) {
       console.warn(`[vector] No checks found for vector '${vectorName}'`);
-      return 0;
+      return 1; // Exit with error if no checks to run
     }
 
     // Filter to only enabled checks
     const enabledChecks = namedChecks.filter(({ definition }) => definition.enabled);
     if (enabledChecks.length === 0) {
-      console.warn(`[vector] All checks for vector '${vectorName}' are disabled`);
-      return 0;
+      console.warn(`[vector] All checks for vector '${vectorName}' are disabled. Nothing to run.`);
+      return 1; // Exit with error if all checks are disabled
     }
 
     if (enabledChecks.length < namedChecks.length) {
