@@ -1,0 +1,227 @@
+# Exercise 5: Task-Level Overrides & Reports
+
+## Goal
+
+Learn to temporarily toggle checks per-task without modifying project config, and view reports in all 3 formats (terminal, JSON, markdown).
+
+## Prerequisites
+
+You should have completed exercises 1–4. Your v2 vector has 3 checks:
+- `test-pass` — run unit tests
+- `no-ts-errors` — TypeScript type checking
+- `lint` — code linting
+
+These are configured in `.vector/config.yaml` under the v2 vector definition.
+
+## Steps
+
+### Step 1: Verify v2 Configuration
+
+Check that your `.vector/config.yaml` includes the v2 vector with all 3 checks:
+
+```yaml
+vectors:
+  v2:
+    trigger: Full — tests + types + lint
+    checks:
+      - test-pass
+      - no-ts-errors
+      - lint
+```
+
+If you don't see this, review exercise 3 to set up the checks.
+
+### Step 2: Disable Lint for This Task
+
+Use the `activate` command to disable the lint check for v2 without modifying the project config:
+
+```bash
+npx vector activate --check lint --off --vector v2
+```
+
+This creates a task-level override in `.vector/active.yaml`.
+
+### Step 3: Inspect the Active Overrides File
+
+Open `.vector/active.yaml` to see the override:
+
+```yaml
+vectors:
+  v2:
+    - test-pass
+    - no-ts-errors
+```
+
+Notice that `lint` is now missing from this list. When you run v2, only these two checks will execute.
+
+### Step 4: Run v2 with Lint Disabled
+
+Run the vector:
+
+```bash
+npx vector run v2
+```
+
+Expected output:
+- Only 2 checks execute: `test-pass` and `no-ts-errors`
+- The `lint` check is skipped entirely
+- Verdict shows "2 checks passed, 1 skipped" or similar
+
+### Step 5: Re-enable Lint
+
+Turn lint back on for this task:
+
+```bash
+npx vector activate --check lint --on --vector v2
+```
+
+This removes the `lint` override from `.vector/active.yaml`, restoring the project default.
+
+### Step 6: Run v2 with All Checks
+
+Run the vector again:
+
+```bash
+npx vector run v2
+```
+
+Expected output:
+- All 3 checks now execute: `test-pass`, `no-ts-errors`, and `lint`
+- Verdict shows "3 checks passed"
+
+### Step 7: View Reports in All 3 Formats
+
+#### Terminal Format (Human-Readable Default)
+
+```bash
+npx vector report
+```
+
+Expected output:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v2
+Task:      Running vector v2
+
+CHECKS
+  [PASS] test-pass ............................ 1234ms
+  [PASS] no-ts-errors ......................... 567ms
+  [PASS] lint ................................. 890ms
+
+VERDICT: PASS (3 checks, 0 retries)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+This is the default, human-readable format. Use it during development to quickly see the status of your checks.
+
+#### JSON Format (CI/CD Pipeable)
+
+```bash
+npx vector report --format json
+```
+
+Expected output:
+
+```json
+{
+  "_meta": {
+    "version": "1.0.0",
+    "generatedAt": "2026-04-02T14:32:10.123Z",
+    "generator": "vector-enforcer"
+  },
+  "report": {
+    "blueprintName": "v2",
+    "taskDescription": "Running vector v2",
+    "verdict": "pass",
+    "checks": [
+      {
+        "checkName": "test-pass",
+        "status": "passed",
+        "duration": 1234
+      },
+      {
+        "checkName": "no-ts-errors",
+        "status": "passed",
+        "duration": 567
+      },
+      {
+        "checkName": "lint",
+        "status": "passed",
+        "duration": 890
+      }
+    ],
+    "retries": [],
+    "escalation": null
+  }
+}
+```
+
+This format is designed for CI/CD pipelines, test aggregators, and programmatic parsing. The `_meta` envelope provides versioning and generation metadata.
+
+#### Markdown Format (GitHub PR Comments)
+
+```bash
+npx vector report --format markdown
+```
+
+Expected output:
+
+```markdown
+## Vector Enforcement Report
+
+**Blueprint:** v2
+**Task:** Running vector v2
+
+### Checks
+
+| Check | Status | Duration |
+|-------|--------|----------|
+| test-pass | :white_check_mark: Pass | 1234ms |
+| no-ts-errors | :white_check_mark: Pass | 567ms |
+| lint | :white_check_mark: Pass | 890ms |
+
+**Verdict: PASS** — 3 checks, 0 retries
+```
+
+This format is perfect for posting enforcement results directly into GitHub PR comments, Slack messages, or other markdown-aware channels.
+
+### Step 8: Clean Up Task Overrides
+
+Delete the `.vector/active.yaml` file to restore project defaults:
+
+```bash
+rm .vector/active.yaml
+```
+
+After removal, `npx vector run v2` will use all checks from `.vector/config.yaml` again.
+
+## What You Learned
+
+1. **Task-level overrides** — Use `.vector/active.yaml` to toggle checks without modifying the project config
+2. **Activate/deactivate checks** — The `npx vector activate` command dynamically enables/disables checks per-task
+3. **Report formats** — View enforcement results in 3 formats:
+   - **Terminal:** human-readable, color-coded, for local development
+   - **JSON:** structured, parseable, for CI/CD and automation
+   - **Markdown:** table-based, for PR comments and documentation
+4. **Cleanup** — Delete `active.yaml` to reset to project defaults
+
+## Congratulations! 🎉
+
+You've completed all 5 exercises! You now know how to:
+
+✓ Initialize Vector in a project (`exercise-1`)
+✓ Run checks and understand their output (`exercise-2`)
+✓ Compose vectors from multiple checks (`exercise-3`)
+✓ Handle check retries and escalation workflows (`exercise-4`)
+✓ Toggle checks per-task and view reports in multiple formats (`exercise-5`)
+
+You're ready to integrate Vector into your CI/CD pipeline, use it in your development workflow, and customize checks for your team's needs.
+
+Next steps:
+- Explore `.vector/config.yaml` to customize checks and vectors for your project
+- Add Vector checks to your GitHub Actions or CI/CD workflow
+- Create custom check commands for your domain-specific needs
