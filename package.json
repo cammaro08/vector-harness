@@ -4,6 +4,9 @@
   "description": "Vector project",
   "private": true,
   "main": "dist/index.js",
+  "bin": {
+    "vector": "./bin/vector"
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
