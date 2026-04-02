@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node
-import { main } from '../src/cli/index';
+#!/usr/bin/env ts-node
+const { main } = require('../src/cli/index');
 
 main().then((code) => process.exit(code));
