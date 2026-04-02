@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { loadProjectConfig } from '../../config';
+import { VectorName } from '../../config/schema';
 
 /**
  * Validate check name format and length.
@@ -79,7 +80,7 @@ export async function checkAddCommand(
             message: 'Check name:',
             placeholder: 'e.g., lint-staged',
             validate: (value) =>
-              validateCheckName(value) ? undefined : 'Invalid name format',
+              value && validateCheckName(value) ? undefined : 'Invalid name format',
           });
 
           if (isCancel(nameInput)) {
@@ -101,7 +102,7 @@ export async function checkAddCommand(
             message: 'Shell command to run:',
             placeholder: 'e.g., npx lint-staged',
             validate: (value) =>
-              validateRunCommand(value) ? undefined : 'Invalid command',
+              value && validateRunCommand(value) ? undefined : 'Invalid command',
           });
 
           if (isCancel(cmdInput)) {
@@ -118,7 +119,7 @@ export async function checkAddCommand(
 
       // Load config to get available vectors
       const config = loadProjectConfig(projectRoot);
-      const availableVectors = Object.keys(config.vectors) as string[];
+      const availableVectors = Object.keys(config.vectors) as VectorName[];
 
       // Prompt for vector assignment
       const selectedVectors = await multiselect({
@@ -134,18 +135,18 @@ export async function checkAddCommand(
         return 1;
       }
 
-      // Add check to config
-      config.checks[checkName] = {
-        run: runCommand,
+      // Add check to config (both are guaranteed set by this point)
+      config.checks[checkName as string] = {
+        run: runCommand as string,
         expect: 'exit-0',
         enabled: true,
       };
 
       // Add check to selected vectors
-      for (const vectorName of selectedVectors) {
+      for (const vectorName of selectedVectors as VectorName[]) {
         if (config.vectors[vectorName]) {
-          if (!config.vectors[vectorName].checks.includes(checkName)) {
-            config.vectors[vectorName].checks.push(checkName);
+          if (!config.vectors[vectorName]!.checks.includes(checkName as string)) {
+            config.vectors[vectorName]!.checks.push(checkName as string);
           }
         }
       }

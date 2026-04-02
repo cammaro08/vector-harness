@@ -576,7 +576,7 @@ describe('checkAddCommand', () => {
     });
 
     it('logs error message on failure', async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       await checkAddCommand(
         {

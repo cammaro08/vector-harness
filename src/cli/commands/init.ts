@@ -22,6 +22,7 @@ import { showBanner } from '../banner';
 import { isInteractive } from '../ui/theme';
 import { generateDefaultConfigYaml } from '../../config';
 import { DEFAULT_CONFIG } from '../../config/defaults';
+import { VectorName } from '../../config/schema';
 
 // Default hook configuration for Claude Code integration
 const DEFAULT_HOOK_COMMAND = 'npx vector run v1';
@@ -30,7 +31,7 @@ const HOOK_TYPE = 'command';
 /**
  * Create an empty config (no checks, just vector structure).
  */
-function generateEmptyConfigYaml(vectorName: string): string {
+function generateEmptyConfigYaml(vectorName: VectorName): string {
   const config: any = {
     version: '2',
     checks: {},
@@ -54,7 +55,7 @@ function generateEmptyConfigYaml(vectorName: string): string {
 /**
  * Create a config with default checks.
  */
-function generateConfigWithDefaults(vectorName: string): string {
+function generateConfigWithDefaults(vectorName: VectorName): string {
   const config = { ...DEFAULT_CONFIG };
   // Replace v1 with user's vector name
   if (config.vectors.v1) {
@@ -225,8 +226,8 @@ async function interactiveInit(projectRoot: string): Promise<number> {
   // Create config.yaml in interactive mode (always write to allow re-initialization)
   const configYaml =
     checksChoice === 'yes'
-      ? generateConfigWithDefaults(vectorName as string)
-      : generateEmptyConfigYaml(vectorName as string);
+      ? generateConfigWithDefaults(vectorName as VectorName)
+      : generateEmptyConfigYaml(vectorName as VectorName);
   fs.writeFileSync(configPath, configYaml, 'utf-8');
 
   // Create hook config if user accepted
