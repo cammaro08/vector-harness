@@ -5,7 +5,7 @@ All documentation for the Vector V2 CLI implementation.
 ## Structure
 
 ```
-docs/vector-v2/
+docs/vector/v2/
 ├── plan/                        # Implementation plan and progress
 │   ├── plan.md                  # 6-phase implementation plan
 │   └── progress.md              # Phase completion tracking

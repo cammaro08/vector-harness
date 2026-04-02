@@ -2,32 +2,48 @@
 
 Documentation for the Vector enforcement protocol — a composable check-and-enforce system for AI-assisted development workflows.
 
-## Documents
+## Structure
 
-### General
+```
+docs/vector/
+├── v2/                          # Current — V2 CLI
+│   ├── plan/                    # Implementation plan and progress
+│   ├── review/                  # Adversarial review, verification, scenario tests
+│   ├── sessions/                # Design discussion transcripts
+│   ├── KEY_CONVERSATIONS.md     # Summary of key design decisions
+│   └── SESSION_SUMMARY.md       # Overall session history
+├── v1/                          # Legacy — V1 Harness
+│   ├── VECTOR_HARNESS_GUIDE.md  # Full verification and usage guide
+│   ├── DECISIONS.md             # Architecture decision log
+│   ├── BLUEPRINT_ORCHESTRATOR_SUMMARY.md  # TDD implementation summary
+│   ├── NEXT_STEPS.md            # V1 implementation roadmap
+│   └── observability-pipeline/  # Terminal, JSON, PR comment reporters
+└── README.md                    # This file
+```
+
+## V2 CLI (Current)
+
+The V2 CLI replaces hardcoded checks with a configurable check registry where every check is a shell command (exit 0 = pass).
 
 | Document | Description |
 |----------|-------------|
-| [VECTOR_HARNESS_GUIDE.md](VECTOR_HARNESS_GUIDE.md) | Full verification and usage guide for the Vector harness |
-| [DECISIONS.md](DECISIONS.md) | Architecture decision log — why choices were made and what alternatives existed |
-| [BLUEPRINT_ORCHESTRATOR_SUMMARY.md](BLUEPRINT_ORCHESTRATOR_SUMMARY.md) | TDD implementation summary for the blueprint orchestrator |
-| [NEXT_STEPS.md](NEXT_STEPS.md) | Implementation roadmap (post-design session) |
-
-### Observability Pipeline (v1, completed)
-
-| Document | Description |
-|----------|-------------|
-| [observability-pipeline/plan.md](observability-pipeline/plan.md) | Layered observability plan — terminal, JSON, PR comment reporters |
-| [observability-pipeline/progress.md](observability-pipeline/progress.md) | Phase completion tracking |
-
-### Vector V2 CLI
-
-The V2 CLI replaces hardcoded checks with a configurable check registry where every check is a shell command. See [v2/README.md](v2/README.md) for the full index.
-
-| Folder | Contents |
-|--------|----------|
-| [v2/plan/](v2/plan/) | 6-phase implementation plan and progress tracking |
-| [v2/review/](v2/review/) | Adversarial review (22 issues), verification report, scenario test results |
-| [v2/sessions/](v2/sessions/) | Design discussion transcripts (protocol debate, pre-merge review) |
+| [v2/plan/plan.md](v2/plan/plan.md) | 6-phase implementation plan |
+| [v2/plan/progress.md](v2/plan/progress.md) | Phase completion tracking |
+| [v2/review/adversarial-review.md](v2/review/adversarial-review.md) | Adversarial review — 22 issues found and fixed |
+| [v2/review/verification-report.md](v2/review/verification-report.md) | Fix verification report |
+| [v2/review/scenario-test-results.md](v2/review/scenario-test-results.md) | 10 manual CLI scenario tests |
 | [v2/KEY_CONVERSATIONS.md](v2/KEY_CONVERSATIONS.md) | Summary of key design decisions |
 | [v2/SESSION_SUMMARY.md](v2/SESSION_SUMMARY.md) | Overall session history |
+
+## V1 Harness (Legacy)
+
+The original Vector harness with hardcoded tool-based checks (`testRunner`, `coverageValidator`, `docValidator`).
+
+| Document | Description |
+|----------|-------------|
+| [v1/VECTOR_HARNESS_GUIDE.md](v1/VECTOR_HARNESS_GUIDE.md) | Full verification and usage guide |
+| [v1/DECISIONS.md](v1/DECISIONS.md) | Architecture decision log |
+| [v1/BLUEPRINT_ORCHESTRATOR_SUMMARY.md](v1/BLUEPRINT_ORCHESTRATOR_SUMMARY.md) | TDD implementation summary for the orchestrator |
+| [v1/NEXT_STEPS.md](v1/NEXT_STEPS.md) | V1 implementation roadmap |
+| [v1/observability-pipeline/plan.md](v1/observability-pipeline/plan.md) | Observability pipeline plan |
+| [v1/observability-pipeline/progress.md](v1/observability-pipeline/progress.md) | Observability pipeline progress |
