@@ -157,6 +157,35 @@ src/
 └── reporters/  # Terminal, JSON, PR comment output
 ```
 
+## Pull Requests
+
+Every PR must include **test evidence** in the description body. This proves the change works and nothing is broken.
+
+**What counts as test evidence:**
+- Output of `npm test` or `npx vitest run` (pass count, fail count)
+- Output of `npx tsc --noEmit` (no type errors)
+- Output of `npx vector run v1` or relevant vector run
+- Manual verification steps with actual output (for docs/tutorial changes)
+- Screenshot or terminal paste of the passing result
+
+**Where to put it:** Add a `## Test Evidence` section in the PR body, after the summary and test plan:
+
+```markdown
+## Summary
+...
+
+## Test plan
+...
+
+## Test evidence
+
+```
+<paste actual terminal output here>
+```
+```
+
+If there are no automated tests (e.g., pure docs PRs), document what manual verification was done (e.g., "Verified all links resolve", "Ran tutorial steps 1-3 against real CLI").
+
 ## Planning Workflow
 
 Use `plans/` for all multi-phase work. Each plan lives in its own folder with a `plan.md` and `progress.md`.
