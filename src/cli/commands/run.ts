@@ -12,6 +12,8 @@ import { runVector } from '../../protocol/engine';
 import { VectorName, ActiveConfig, VectorConfig } from '../../config/schema';
 import { formatReport } from '../../../tools/terminalReporter';
 import { writeReportToJSON } from '../../../tools/jsonLogger';
+import { EnforcementReport } from '../../protocol/types';
+import { S, colors, statusIcon } from '../ui/theme';
 
 /**
  * Resolve check names for a vector, respecting active overrides.
@@ -31,6 +33,73 @@ function resolveNamedChecks(
   return checkNames
     .filter((name) => config.checks[name] !== undefined)
     .map((name) => ({ name, definition: { ...config.checks[name] } }));
+}
+
+/**
+ * Format duration in milliseconds to a human-readable string (e.g., "1.2s")
+ */
+function formatDuration(ms: number): string {
+  const seconds = ms / 1000;
+  return `${seconds.toFixed(1)}s`;
+}
+
+/**
+ * Format a styled clack-style output for the enforcement report.
+ *
+ * Shows:
+ * - Header with vector name
+ * - Each check with status icon and duration
+ * - Error details for failed checks
+ * - Summary with pass/fail/skip counts
+ */
+export function formatStyledRun(report: EnforcementReport): string {
+  const lines: string[] = [];
+
+  // Header
+  lines.push(S.start + '   ' + colors.brand(S.step + '  vector run ' + report.blueprintName));
+  lines.push(S.middle);
+
+  // Show each check
+  for (const check of report.checks) {
+    const icon = statusIcon(check.status);
+    const duration = formatDuration(check.duration);
+    // Line with active symbol and check name
+    lines.push(`${S.middle}${colors.info(S.active)}  Running: ${colors.highlight(check.checkName)}`);
+    // Line with status result
+    lines.push(`${S.middle}  ${icon} ${check.checkName} ${check.status} (${duration})`);
+
+    // Show error details if failed
+    if (check.status === 'failed' && check.details?.message) {
+      const errorMsg = check.details.message;
+      const errorLines = errorMsg.split('\n');
+      for (const errorLine of errorLines) {
+        lines.push(`${S.middle}  ${S.middle}  ${colors.error(errorLine)}`);
+      }
+    }
+
+    lines.push(S.middle);
+  }
+
+  // Summary line
+  const passedCount = report.checks.filter((c) => c.status === 'passed').length;
+  const failedCount = report.checks.filter((c) => c.status === 'failed').length;
+  const skippedCount = report.checks.filter((c) => c.status === 'skipped').length;
+
+  const summaryParts: string[] = [];
+  if (passedCount > 0) {
+    summaryParts.push(colors.success(`${passedCount} passed`));
+  }
+  if (failedCount > 0) {
+    summaryParts.push(colors.error(`${failedCount} failed`));
+  }
+  if (skippedCount > 0) {
+    summaryParts.push(colors.muted(`${skippedCount} skipped`));
+  }
+
+  const summary = summaryParts.length > 0 ? summaryParts.join(', ') : 'no checks';
+  lines.push(S.end + '  ' + report.blueprintName + ': ' + summary);
+
+  return lines.join('\n');
 }
 
 /**
@@ -56,10 +125,15 @@ function getGitInfo(cwd: string): { branch: string; commit: string } {
  * 5. Writes JSON report to .vector/reports/
  *
  * Returns 0 on success, 1 on failure.
+ *
+ * @param vectorName Vector name to run (required)
+ * @param projectRoot Project root directory
+ * @param flags Optional command-line flags
  */
 export async function runCommand(
   vectorName: string,
-  projectRoot: string
+  projectRoot: string,
+  flags?: Record<string, string | boolean>
 ): Promise<number> {
   try {
     // Load configurations

@@ -123,12 +123,25 @@ After running `npx vector init`, your project structure should look like:
 When you run `npx vector run v1`, you should see output like:
 
 ```
-Vector v1: Full test suite and type check
+[vector] Running vector 'v1' with 2 check(s):
+  - test-pass: "npm test" (enabled)
+  - no-ts-errors: "npx tsc --noEmit" (enabled)
 
-✓ test-pass (1.2s)
-✓ no-ts-errors (0.8s)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-All checks passed in 2.0s
+Blueprint: v1
+Task:      Running vector v1
+
+CHECKS
+  [PASS] test-pass .................... 1234ms
+  [PASS] no-ts-errors ................. 567ms
+
+VERDICT: PASS (2 checks, 1801ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] All checks passed.
 ```
 
 ## What You Learned

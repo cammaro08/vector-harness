@@ -69,6 +69,11 @@ Expected behavior:
 Expected terminal output:
 
 ```
+[vector] Running vector 'v1' with 3 check(s):
+  - test-pass: "npm test -- --run" (enabled)
+  - flaky-test: "bash -c '[ $((RANDOM % 2)) -eq 0 ] && exit 0 || exit 1'" (enabled)
+  - always-fail: "exit 1" (enabled)
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   VECTOR ENFORCEMENT REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -77,24 +82,26 @@ Blueprint: v1
 Task:      Running vector v1
 
 CHECKS
-  [PASS] test-pass ............................ 1234ms
-  [PASS] flaky-test ........................... 876ms
-  [FAIL] always-fail .......................... 12ms
+  [PASS] test-pass .................... 1234ms
+  [PASS] flaky-test ................... 876ms
+  [FAIL] always-fail .................. 12ms
          Command exited with code 1
 
 RETRIES
-  always-fail: 4 attempts, all failed
-    #1 FAIL (12ms)
-    #2 FAIL (10ms)
-    #3 FAIL (11ms)
-    #4 FAIL (10ms)
+  always-fail: 4 attempts
+    #1 FAIL (12ms): Command exited with code 1
+    #2 FAIL (10ms): Command exited with code 1
+    #3 FAIL (11ms): Command exited with code 1
+    #4 FAIL (10ms): Command exited with code 1
 
 ESCALATION
   Reason:     Check 'always-fail' failed after 4 attempts
-  Suggestion: Review the check configuration or the underlying command
+  Suggestion: Review the check configuration or the underlying command: exit 1
 
-VERDICT: FAIL (3 checks, 1 retry series)
+VERDICT: FAIL (3 checks, 1 retry, 2143ms total)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] Some checks failed. See report above.
 ```
 
 ### 6. Modify `maxRetries` and re-run

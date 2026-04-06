@@ -256,7 +256,7 @@ export async function main(argv?: string[]): Promise<number> {
         return 0;
 
       case 'init':
-        return await initCommand(projectRoot);
+        return await initCommand(parsed.flags, projectRoot);
 
       case 'run': {
         if (parsed.positional.length === 0) {
@@ -265,7 +265,7 @@ export async function main(argv?: string[]): Promise<number> {
           return 1;
         }
         const vectorName = parsed.positional[0];
-        return await runCommand(vectorName, projectRoot);
+        return await runCommand(vectorName, projectRoot, parsed.flags);
       }
 
       case 'activate':

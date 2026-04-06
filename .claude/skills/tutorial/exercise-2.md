@@ -17,6 +17,10 @@ Observe the output. Both `test-pass` and `no-ts-errors` should PASS since the se
 Expected terminal output:
 
 ```
+[vector] Running vector 'v1' with 2 check(s):
+  - test-pass: "npm test" (enabled)
+  - no-ts-errors: "npx tsc --noEmit" (enabled)
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   VECTOR ENFORCEMENT REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -25,11 +29,13 @@ Blueprint: v1
 Task:      Running vector v1
 
 CHECKS
-  [PASS] test-pass ............................ 1234ms
-  [PASS] no-ts-errors ......................... 567ms
+  [PASS] test-pass .................... 1234ms
+  [PASS] no-ts-errors ................. 567ms
 
-VERDICT: PASS (2 checks, 0 retries)
+VERDICT: PASS (2 checks, 1801ms total)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] All checks passed.
 ```
 
 Notice:
@@ -60,6 +66,10 @@ Observe the output:
 Expected terminal output with retries and escalation:
 
 ```
+[vector] Running vector 'v1' with 2 check(s):
+  - test-pass: "npm test" (enabled)
+  - no-ts-errors: "npx tsc --noEmit" (enabled)
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   VECTOR ENFORCEMENT REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -68,23 +78,25 @@ Blueprint: v1
 Task:      Running vector v1
 
 CHECKS
-  [PASS] test-pass ............................ 1234ms
-  [FAIL] no-ts-errors ......................... 890ms
+  [PASS] test-pass .................... 1234ms
+  [FAIL] no-ts-errors ................. 890ms
          Command exited with code 1
 
 RETRIES
-  no-ts-errors: 4 attempts, all failed
-    #1 FAIL (890ms)
-    #2 FAIL (870ms)
-    #3 FAIL (885ms)
-    #4 FAIL (892ms)
+  no-ts-errors: 4 attempts
+    #1 FAIL (890ms): Command exited with code 1
+    #2 FAIL (870ms): Command exited with code 1
+    #3 FAIL (885ms): Command exited with code 1
+    #4 FAIL (892ms): Command exited with code 1
 
 ESCALATION
   Reason:     Check 'no-ts-errors' failed after 4 attempts
-  Suggestion: Review the check configuration or the underlying command
+  Suggestion: Review the check configuration or the underlying command: npx tsc --noEmit
 
-VERDICT: FAIL (2 checks, 1 retry series)
+VERDICT: FAIL (2 checks, 1 retry, 4771ms total)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] Some checks failed. See report above.
 ```
 
 Key observations:
@@ -110,6 +122,10 @@ npx vector run v1
 Both checks should now pass again, exit code 0.
 
 ```
+[vector] Running vector 'v1' with 2 check(s):
+  - test-pass: "npm test" (enabled)
+  - no-ts-errors: "npx tsc --noEmit" (enabled)
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   VECTOR ENFORCEMENT REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -118,11 +134,13 @@ Blueprint: v1
 Task:      Running vector v1
 
 CHECKS
-  [PASS] test-pass ............................ 1234ms
-  [PASS] no-ts-errors ......................... 567ms
+  [PASS] test-pass .................... 1234ms
+  [PASS] no-ts-errors ................. 567ms
 
-VERDICT: PASS (2 checks, 0 retries)
+VERDICT: PASS (2 checks, 1801ms total)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] All checks passed.
 ```
 
 ## What You Learned

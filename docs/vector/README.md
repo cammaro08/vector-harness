@@ -34,6 +34,7 @@ The V2 CLI replaces hardcoded checks with a configurable check registry where ev
 | [v2/review/scenario-test-results.md](v2/review/scenario-test-results.md) | 10 manual CLI scenario tests |
 | [v2/KEY_CONVERSATIONS.md](v2/KEY_CONVERSATIONS.md) | Summary of key design decisions |
 | [v2/SESSION_SUMMARY.md](v2/SESSION_SUMMARY.md) | Overall session history |
+| [Tutorial](./../.claude/skills/tutorial/SKILL.md) | Hands-on tutorial with 5 exercises |
 
 ## V1 Harness (Legacy)
 

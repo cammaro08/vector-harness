@@ -21,6 +21,16 @@ docs/vector/v2/
 └── SESSION_SUMMARY.md           # Overall session history
 ```
 
+## Features
+
+The V2 CLI includes:
+- **Configurable check registry** — Define checks in `.vector/config.yaml`, every check is a shell command (exit 0 = pass)
+- **Interactive mode** — Interactive prompts for `vector init` and `vector check add`
+- **Non-interactive mode** — Use `--yes` flag or pass options directly for CI/CD and automation
+- **Retry & escalation** — Automatic retry on failure with attempt history, escalation when exhausted
+- **Task-level overrides** — Toggle checks on/off per task via `.vector/active.yaml`
+- **Multiple reporters** — Terminal, JSON, and GitHub PR comment output formats
+
 ## Quick Links
 
 - **What is Vector V2?** See [plan/plan.md](plan/plan.md)

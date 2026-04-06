@@ -16,15 +16,29 @@ The core insight: right now, **you** are the enforcement layer. You check, corre
 
 ## Quick Start
 
+### Interactive Mode
+
 ```bash
-# Initialize Vector in your project
+# Initialize Vector with an interactive wizard
 npx vector init
+
+# Add a custom check with interactive prompts
+npx vector check add
+```
+
+The interactive CLI guides you through setup with prompts for vector name, default checks, and hook configuration.
+
+### Non-Interactive Mode
+
+```bash
+# Initialize with defaults (no prompts)
+npx vector init --yes
+
+# Add a check without prompts
+npx vector check add --name lint --run "npm run lint"
 
 # Run checks for a vector
 npx vector run v1
-
-# Add a custom check
-npx vector check add --name lint --run "npm run lint"
 
 # Toggle checks per task
 npx vector activate --check test-pass --on --vector v2
@@ -81,11 +95,12 @@ src/
 ├── config/     # Schema, loader, defaults for .vector/*.yaml
 ├── protocol/   # Engine that runs checks → EnforcementReport
 ├── cli/        # CLI commands (init, run, activate, report, check add)
+│   └── ui/     # Theme, banner, search-multiselect, interactive components
 ├── adapters/   # Claude Code hook integration
 └── reporters/  # Terminal, JSON, PR comment output
 ```
 
-The protocol core is **platform-agnostic**. Claude Code integration is an adapter — Vector can work with any AI agent that speaks shell commands.
+The protocol core is **platform-agnostic**. Claude Code integration is an adapter — Vector can work with any AI agent that speaks shell commands. The UI layer provides interactive prompts and visual feedback via the `ui/` module.
 
 ---
 
@@ -120,6 +135,6 @@ See [`docs/vector/README.md`](docs/vector/README.md) for the full index.
 
 ## Status
 
-V2 CLI is implemented and merged. Config schema, protocol engine, CLI commands, reporters, and Claude Code adapter are all built and tested.
+V2 CLI is fully implemented with interactive mode. Config schema, protocol engine, CLI commands, interactive UI components, reporters, and Claude Code adapter are all built and tested.
 
 Built on a Brompton, between stations.

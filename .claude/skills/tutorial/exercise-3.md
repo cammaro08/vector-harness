@@ -142,58 +142,135 @@ npx vector run v2
 ### v1 Output (Step 6)
 
 ```
-✓ test-pass (250ms)
+[vector] Running vector 'v1' with 1 check(s):
+  - test-pass: "npm test -- --run" (enabled)
 
-1 passed · 0 failed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v1
+Task:      Running vector v1
+
+CHECKS
+  [PASS] test-pass .................... 250ms
+
+VERDICT: PASS (1 check, 250ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] All checks passed.
 ```
 
 ### v2 Output (Step 7)
 
 ```
-✓ test-pass (250ms)
-✓ no-ts-errors (1.2s)
-✓ lint (800ms)
+[vector] Running vector 'v2' with 3 check(s):
+  - test-pass: "npm test -- --run" (enabled)
+  - no-ts-errors: "npx tsc --noEmit" (enabled)
+  - lint: "npx eslint src/" (enabled)
 
-3 passed · 0 failed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v2
+Task:      Running vector v2
+
+CHECKS
+  [PASS] test-pass .................... 250ms
+  [PASS] no-ts-errors ................. 1200ms
+  [PASS] lint .......................... 800ms
+
+VERDICT: PASS (3 checks, 2250ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] All checks passed.
 ```
 
 ### v2 with Lint Failure (Step 8)
 
 ```
-✓ test-pass (250ms)
-✓ no-ts-errors (1.2s)
-✗ lint (900ms)
-  Error: 1 error found by ESLint
+[vector] Running vector 'v2' with 3 check(s):
+  - test-pass: "npm test -- --run" (enabled)
+  - no-ts-errors: "npx tsc --noEmit" (enabled)
+  - lint: "npx eslint src/" (enabled)
 
-2 passed · 1 failed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  VECTOR ENFORCEMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blueprint: v2
+Task:      Running vector v2
+
+CHECKS
+  [PASS] test-pass .................... 250ms
+  [PASS] no-ts-errors ................. 1200ms
+  [FAIL] lint .......................... 900ms
+         Command exited with code 1
+
+RETRIES
+  lint: 4 attempts
+    #1 FAIL (900ms): Command exited with code 1
+    #2 FAIL (890ms): Command exited with code 1
+    #3 FAIL (895ms): Command exited with code 1
+    #4 FAIL (885ms): Command exited with code 1
+
+ESCALATION
+  Reason:     Check 'lint' failed after 4 attempts
+  Suggestion: Review the check configuration or the underlying command: npx eslint src/
+
+VERDICT: FAIL (3 checks, 1 retry, 3970ms total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[vector] Some checks failed. See report above.
 ```
 
 JSON report shows:
 
 ```json
 {
-  "_meta": {
-    "blueprint": "v2",
-    "status": "failed"
-  },
+  "id": "v2-...",
+  "blueprintName": "v2",
+  "taskDescription": "Running vector v2",
+  "verdict": "fail",
   "checks": [
     {
-      "name": "test-pass",
+      "checkName": "test-pass",
       "status": "passed",
-      "duration": 250
+      "duration": 250,
+      "details": { "message": "passed\nStdout: ..." }
     },
     {
-      "name": "no-ts-errors",
+      "checkName": "no-ts-errors",
       "status": "passed",
-      "duration": 1200
+      "duration": 1200,
+      "details": { "message": "passed\nStdout: ..." }
     },
     {
-      "name": "lint",
+      "checkName": "lint",
       "status": "failed",
       "duration": 900,
-      "error": "1 error found by ESLint"
+      "details": { "message": "Command exited with code 1\nStdout: ...\nStderr: ..." }
     }
-  ]
+  ],
+  "retries": [
+    {
+      "checkName": "lint",
+      "attempts": [
+        { "status": "failed", "duration": 900, "message": "Command exited with code 1" },
+        { "status": "failed", "duration": 890, "message": "Command exited with code 1" },
+        { "status": "failed", "duration": 895, "message": "Command exited with code 1" },
+        { "status": "failed", "duration": 885, "message": "Command exited with code 1" }
+      ]
+    }
+  ],
+  "escalation": {
+    "reason": "Check 'lint' failed after 4 attempts",
+    "suggestion": "Review the check configuration or the underlying command: npx eslint src/"
+  },
+  "timestamp": "...",
+  "totalDuration": 3970,
+  "environment": { "cwd": "...", "gitBranch": "...", "gitCommit": "..." }
 }
 ```
 
